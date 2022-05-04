@@ -1,0 +1,11 @@
+source 'https://rubygems.org'
+gem 'sqlite3'
+gem 'rice'
+gem 'singleton'
+
+gem 'rspec'
+gem 'factory_bot'
+gem 'guard'
+gem 'guard-rspec'
+gem 'debug'
+gem 'gem-ctags'

@@ -1,0 +1,6 @@
+build
+Makefile
+*.log
+*.so
+*.o
+
