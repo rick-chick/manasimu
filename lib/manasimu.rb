@@ -1,6 +1,6 @@
+require 'bundler'
 Bundler.require
 
-require_relative './manasimu/mana_type.rb'
 require_relative './manasimu/card.rb'
 require_relative './manasimu/planner.rb'
 require_relative './manasimu/game.rb'

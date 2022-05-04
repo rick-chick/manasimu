@@ -7,5 +7,5 @@ Gem::Specification.new do |s|
   s.authors     = ["so1itaryrove"]
   s.email       = 'so1itaryrove@gmail.com'
   s.license     = 'MIT'
-  s.files       = ["lib/manasimu.rb"]
+  s.files       = Dir["lib/manasimu.rb", "lib/manasimu/*.rb", "ext/*.so", "db/*"]
 end
