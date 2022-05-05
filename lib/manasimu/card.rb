@@ -130,7 +130,13 @@ class CardType
   end
 
   def mana_cost
-    @mana_cost ||= @contents.select {|c| c.types != "Land"}.first.mana_cost
+    return @mana_cost if @mana_cost
+    spell = @contents.select {|c| c.types != "Land"}.first
+    if spell
+      @mana_cost = spell.mana_cost
+    else
+      @mana_cost = '0'
+    end
   end
 
   def price
