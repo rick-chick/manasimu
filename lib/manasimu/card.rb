@@ -246,20 +246,17 @@ end
 
 class CardTypeAggregate
 
-  def find(card_type)
+  def find(set_code, number)
     @memo ||= []
-    return nil if not card_type
-    singleton = @memo.find do |c|
+    @memo.find do |c|
       a = c.contents[0]
-      b = card_type.contents[0]
-      a and b and a.name == b.name
+      a and a.set_code == set_code and a.number == number
     end
-    if singleton
-      singleton
-    else
-      @memo << card_type
-      card_type
-    end
+  end
+
+  def add(card_type)
+    @memo ||= []
+    @memo << card_type
   end
 
   def each

@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-gem 'sqlite3'
+ruby "3.0.0"
 gem 'rice'
 gem 'singleton'
 gem 'bundler'
@@ -10,3 +10,4 @@ gem 'guard'
 gem 'guard-rspec'
 gem 'debug'
 gem 'gem-ctags'
+

@@ -61,50 +61,15 @@ class Deck
   end
 
   def self.get_card_details(deck_items)
-    path = File.expand_path( '../../../db/AllPrintings.sqlite', __FILE__ )
-    db = SQLite3::Database.new(path)
-    sql = <<DOC
-    select distinct 
-      name
-     ,number
-     ,colorIdentity
-     ,side
-     ,setCode
-     ,manaCost
-     ,types 
-     ,text
-     ,convertedManaCost
-    from cards 
-    where 
-      number = ? and
-      setCode = ?
-DOC
+    path = File.expand_path( '../../../db/card_type_aggregate', __FILE__ )
+    @@card_types ||= Marshal.load(File.open(path, 'r'))
     cards = []
     card_id = 0
-    card_types = CardTypeAggregate.new
+    card_types = []
     deck_items.each do |deck_item|
-      rows = db.execute(sql, deck_item[:setnum], deck_item[:set])
-      if rows.empty?
-        puts deck_item[:name]
-      end
-
-      card_type = card_types.find(
-        CardType.new(rows.map { |row|
-          {
-            name: row[0],
-            number: row[1],
-            color_identity: row[2],
-            side: row[3],
-            set_code: row[4],
-            mana_cost: row[5],
-            types: row[6],
-            text: row[7],
-            converted_mana_cost: row[8]
-          }
-        })
-      )
+      card_type = @@card_types.find(deck_item[:set], deck_item[:setnum])
+      card_types << card_type
       card = Card.new(card_type)
-
       deck_item[:amount].to_i.times do 
         card_clone = card.dup
         card_clone.id = card_id
