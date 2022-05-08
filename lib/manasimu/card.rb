@@ -75,7 +75,16 @@ class Card
 end
 
 class CardType
-  attr_accessor :contents
+  attr_accessor :contents, :played, :drawed, :name
+
+  def self.create(card_type, name)
+    ret = card_type.dup
+    ret.contents = card_type.contents
+    ret.played = nil
+    ret.drawed = nil
+    ret.name = name
+    ret
+  end
 
   def initialize(contents)
     return if not contents
@@ -290,6 +299,7 @@ class Content
   def to_s
     "[#{@name}] [#{@types}] [#{@color_identity}] [#{@mana_cost}]"
   end
+
 end
 
 class FordFulkersonSingleton

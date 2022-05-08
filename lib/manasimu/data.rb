@@ -68,8 +68,9 @@ class Deck
     card_types = []
     deck_items.each do |deck_item|
       card_type = @@card_types.find(deck_item[:set], deck_item[:setnum])
-      card_types << card_type
-      card = Card.new(card_type)
+      clone = CardType.create(card_type, deck_item[:name])
+      card_types << clone
+      card = Card.new(clone)
       deck_item[:amount].to_i.times do 
         card_clone = card.dup
         card_clone.id = card_id
