@@ -73,4 +73,28 @@ FactoryBot.define do
     color_identity { 'G'}
     converted_mana_cost { 0}
   end
+
+  factory :darkbore_pathway_content, class: Content do
+    name  {'Darkbore Pathway // Slitherbore Pathway'}
+    number {'254'}
+    side {'a'}
+    set_code { 'KHM'}
+    mana_cost { ''}
+    types { 'Land'}
+    text { '{T}: Add {B}.'}
+    color_identity { 'B,G'}
+    converted_mana_cost {0}
+  end
+
+  factory :slitherbore_pathway_content, class: Content do
+    name  {'Forest'}
+    number {'254'}
+    side {'b'}
+    set_code { 'KHM'}
+    mana_cost { ''}
+    types { 'Land'}
+    text { '{T}: Add {G}.'}
+    color_identity { 'B,G'}
+    converted_mana_cost {0}
+  end
 end

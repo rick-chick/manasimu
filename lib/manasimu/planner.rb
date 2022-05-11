@@ -6,6 +6,8 @@ class Planner
     max_price =  0
     max_spells = nil
     max_land = nil
+    max_symbols = nil
+    max_lands = nil
 
     if not lands_in_hand.empty?
       lands_in_hand.each do |play_land|
@@ -18,21 +20,31 @@ class Planner
         current_fields << play_land
 
         # search_opt_spells
-        price, spells = 
+        price, spells, symbols, lands = 
           search_opt_spells(current_hands, current_fields)
         if price >= max_price and not spells.empty?
           max_price = price
           max_spells = spells
           max_land = play_land
+          max_symbols = symbols
+          max_lands = lands
         end
       end
     else
       # search_opt_spells
-      max_price, max_spells = search_opt_spells(hands, fields)
+      max_price, max_spells, max_symbols, max_lands = search_opt_spells(hands, fields)
     end
 
     if not max_spells and not lands_in_hand.empty?
       max_land = lands_in_hand[0]
+    end
+
+    if max_lands
+      max_lands.each_with_index do |land, i|
+        if not land.mana_produced?
+          land.first_produce_symbol = max_symbols[i]
+        end
+      end
     end
 
     [max_land, max_spells].select {|a| a}.flatten
@@ -60,92 +72,86 @@ class Planner
     bit_lands = 0
     bit_spells = 0
     # search playable spell comibantion
-    cost, bit_spells, bit_lands =
-      dfs(1, spells, lands, bit_spells, bit_lands, price)
-    [price, bit_select(spells, bit_spells)]
+    cost, bit_spells, bit_lands, land_symbols =
+      dfs(1, spells, lands, bit_spells, bit_lands, price, [])
+    [price, bit_select(spells, bit_spells), land_symbols, lands]
   end
 
-  def dfs(n, spells, lands, bit_spells, bit_lands, price)
+  def dfs(n, spells, lands, bit_spells, bit_lands, price, total_land_symbols)
     index = n - 1
 
     # exit
-    return [price, bit_spells, bit_lands] if n > spells.length
+    return [price, bit_spells, bit_lands, total_land_symbols] if n > spells.length
 
     spell = spells[index]
-    # ex) lands [a,b,c,d]
-    #     bit_lands is 3 ( = 0011)
-    #     then left_lands to be [c, d]
-    left_lands = bit_select(lands, reverse_bit(bit_lands, lands.length))
+    used_lands = bit_lands.to_s(2).chars
+    capas = lands.length.times.to_a.map do |i|
+      used_lands[i] == "1" ? "0" : "1"
+    end
+
+    # shrink
+    # lands_available = []
+    # lands.length.times do |i|
+    #   next if used_lands[i] == "1"
+    #   lands_available << lands[i]
+    # end
+    # capas = ("1" * lands_available.length).chars
 
     # cast case
-    is_playable, used_lands = spell.playable?(left_lands)
-    a_price, a_bit_spells, a_bit_lands = 
+    is_playable, casted_lands, land_symbols = 
+      spell.playable?(lands, capas)
+
+    # expand
+    # used_lands_ = []
+    # land_symbols_ = []
+    # j = 0
+    # lands.length.times do |i|
+    #   if used_lands[i] == "1" or not casted_lands
+    #     used_lands_ << "1"
+    #     land_symbols_ << total_land_symbols[i]
+    #   else
+    #     used_lands_ << casted_lands[j]
+    #     land_symbols_ << land_symbols[j]
+    #     j += 1
+    #   end
+    # end if lands
+
+    a_price, a_bit_spells, a_bit_lands, a_land_symbols = 
       if is_playable
+
         bit_spells = bit_spells | 1 << ( n - 1 )
-        # ex) lands [a,b,c,d]
-        #      bit_lands 3 ( = 0011)
-        #     used_lands [d]
-        #     then used_lands to be [0,0,0,d]
-        used_lands = fill_used_lands(used_lands, bit_lands, lands)
-        # ex) used_lands [0,0,0,d]
-        #     bit_lands 3 ( = 0011)
-        #     then bit_lands to be 11 ( = 1011)
-        bit_lands = update_bit(used_lands, bit_lands)
+        bit_lands_ = casted_lands
+          .reverse
+          .map {|i| i.to_s}
+          .join('')
+          .to_i(2)
+
+        land_symbols_ = lands.length.times.to_a.map do |i|
+          land_symbols[i] ? land_symbols[i] : total_land_symbols[i]
+        end
+
         # dfs
-        dfs(n + 1 , spells, lands, bit_spells, bit_lands, price + spell.price)
+        dfs(n + 1 , spells, lands, bit_spells, bit_lands_, 
+            price + spell.price, land_symbols_)
       else
-        [nil, nil, nil]
+        [nil, nil, nil, nil]
       end
 
     # not cast case
-    b_price, b_bit_spells, b_bit_lands = 
-      dfs(n + 1 , spells, lands, bit_spells, bit_lands, price)
+    b_price, b_bit_spells, b_bit_lands, b_land_symbols = 
+      dfs(n + 1 , spells, lands, bit_spells, bit_lands, price, total_land_symbols)
 
     if (a_price and a_price >= b_price)
-      [a_price, a_bit_spells, a_bit_lands]
+      [a_price, a_bit_spells, a_bit_lands, a_land_symbols]
     else
-      [b_price, b_bit_spells, b_bit_lands]
+      [b_price, b_bit_spells, b_bit_lands, b_land_symbols]
     end
-  end
-
-  def reverse_bit(bit, length)
-    s = bit.to_s(2)
-    length.times.to_a.map do |i|
-      if s[i] and s[i] == "1"
-        "0"
-      else
-        "1"
-      end
-    end.join.to_i(2)
   end
 
   def bit_select(cards, bit)
     cards.length.times
           .map { |i| cards[i] if (bit & (1 << i) > 0) }
           .select { |o| o }
-  end
-
-  def update_bit(used_lands, bit_lands)
-    used_lands.each_with_index do |flg, i|
-      bit_lands = bit_lands | ( 1 << i ) if flg == 1
-    end
-    bit_lands
-  end
-
-  def fill_used_lands(used_lands, bit_lands, lands)
-    result = []
-    j = 0
-    lands.length.times do |i|
-      if (bit_lands & 1 << i) == 1
-        # used before dfs
-        result << 1
-      else
-        # used after dfs
-        result << used_lands[j]
-        j += 1
-      end
-    end
-    result
   end
 
   def lands(list)

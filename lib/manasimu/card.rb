@@ -1,5 +1,5 @@
 class Card
-  attr_accessor :id, :card_type
+  attr_accessor :id, :card_type, :side
 
   def initialize(card_type)
     @card_type = card_type
@@ -13,10 +13,12 @@ class Card
     @card_type.drawed(turn)
   end
 
-  def played(turn)
+  def played(turn, side = "a")
     @played = turn
+    @side = side
     @card_type.played(turn)
   end
+
   def played?
     @played.nil?
   end
@@ -29,8 +31,8 @@ class Card
     @card_type.mana_source?
   end
 
-  def playable?(lands)
-    @card_type.playable?(lands)
+  def playable?(lands, capas)
+    @card_type.playable?(lands, capas)
   end
 
   def types
@@ -61,12 +63,23 @@ class Card
     @card_type.price
   end
 
-  def max_flow(lands)
-    @card_type.max_flow(lands)
+  def reset
+    @side = nil
   end
 
-  def edges(lands)
-    @card_type.edges(lands)
+  def max_flow(lands, capas)
+    @card_type.max_flow(lands, capas)
+  end
+
+  def edges(lands, capas)
+    @card_type.edges(lands, capas)
+  end
+
+  def mana_produced?
+    @side
+  end
+
+  def first_produce_symbol=(symbol)
   end
 
   def to_s
@@ -148,18 +161,42 @@ class CardType
     end
   end
 
+  def symbols
+    return @symbols if @symbols
+    @symbols = []
+    mana_cost[1..-2].split('}{').each_with_index do |mana, j|
+      spell_colors = mana.split('/')
+      if spell_colors.length == 1 
+        spell_color = spell_colors[0]
+        if spell_color.to_i.to_s == spell_color
+          # numeric symbol
+          spell_color.to_i.times do |k|
+            @symbols << "1"
+          end
+        else
+          # color symbol
+          @symbols << spell_color
+        end
+      else
+        # multi symbol
+        throw Exception.new('unprogramed exception')
+      end
+    end
+    @symbols
+  end
+
   def price
     converted_mana_cost
   end
 
-  def playable?(lands)
-    return [false, []] if lands.empty?
-    return [false, []] if converted_mana_cost > lands.length
-    mf, used = max_flow(lands)
-    [mf == converted_mana_cost, used.to_a[1..lands.length]]
+  def playable?(lands, capas)
+    return [false, [], []] if lands.empty?
+    return [false, [], []] if converted_mana_cost > lands.length
+    mf, used, land_symbols = max_flow(lands, capas)
+    [mf == converted_mana_cost, used.to_a[1..lands.length], land_symbols]
   end
 
-  def max_flow(lands)
+  def max_flow(lands, capas)
     obj = FordFulkersonSingleton.instance.obj
     # Graph has x+y+2 nodes
     # source       : 0
@@ -174,17 +211,29 @@ class CardType
     #
 
     # create edge
-    x, y, e = edges(lands)
+    x, y, e = edges(lands, capas)
     g = Graph.new(x + y + 2)
     e.each do |s, d|
       g.add_edge(s, d, 1)
     end
 
     ret = obj.max_flow(g, 0, x + y + 1)
-    [ret, obj.used]
+
+    land_symbols = Array.new(lands.length)
+    for edges in g.G do
+      for edge in edges do
+        if edge.cap == 0 and edge.from.between?(1, x) and edge.to.between?(x+1, x+y)
+          land_index = edge.from - 1
+          spell_index = edge.to - x - 1
+          land_symbols[land_index] = symbols[spell_index] 
+        end
+      end
+    end
+
+    [ret, obj.used, land_symbols]
   end
 
-  def edges(lands)
+  def edges(lands, capas)
     result = []
     x = lands.length
     i_src = 0
@@ -193,29 +242,9 @@ class CardType
       result << [i_src, i + 1]
     end
 
-    # create symbol
-    symbols = []
-    mana_cost[1..-2].split('}{').each_with_index do |mana, j|
-      spell_colors = mana.split('/')
-      if spell_colors.length == 1 
-        spell_color = spell_colors[0]
-        if spell_color.to_i.to_s == spell_color
-          # numeric symbol
-          spell_color.to_i.times do |k|
-            symbols << "1"
-          end
-        else
-          # color symbol
-          symbols << spell_color
-        end
-      else
-        # multi symbol
-        throw Exception.new('unprogramed exception')
-      end
-    end
-
     # lands and mana_cost connect to each symbols
     lands.each_with_index do |land, i|
+      next if capas[i].to_i == 0
       land_colors = land.color_identity
       symbols.each_with_index do |symbol, j|
         if symbol == "1" or land_colors.include? symbol

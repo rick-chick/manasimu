@@ -31,14 +31,15 @@ RSpec.describe Planner do
         price = 0
 
         planner = Planner.new
-        allow(spells[0]).to receive(:playable?).and_return([true, [1]])
+        allow(spells[0]).to receive(:playable?).and_return([true, [1], ['B']])
 
-        price, bit_spells, bit_lands = 
-          planner.dfs(1, spells, lands, bit_spells, bit_lands, price)
+        price, bit_spells, bit_lands, land_symbols = 
+          planner.dfs(1, spells, lands, bit_spells, bit_lands, price, [])
 
         expect(price).to eq(1)
         expect(bit_spells).to eq (1)
         expect(bit_lands).to eq (1)
+        expect(land_symbols).to eq (["B"])
       end
 
       it "is expect to be present not match if spell was not playable" do 
@@ -49,14 +50,15 @@ RSpec.describe Planner do
         price = 0
 
         planner = Planner.new
-        allow(spells[0]).to receive(:playable?).and_return([false, []])
+        allow(spells[0]).to receive(:playable?).and_return([false, [], []])
 
-        price, bit_spells, bit_lands = 
-          planner.dfs(1, spells, lands, bit_spells, bit_lands, price)
+        price, bit_spells, bit_lands , land_symbols = 
+          planner.dfs(1, spells, lands, bit_spells, bit_lands, price, [])
 
         expect(price).to eq(0)
         expect(bit_spells).to eq (0)
         expect(bit_lands).to eq (0)
+        expect(land_symbols).to eq ([])
       end
     end
 
@@ -69,18 +71,19 @@ RSpec.describe Planner do
         price = 0
 
         planner = Planner.new
-        allow(spells[0]).to receive(:playable?).and_return([true, [1,1]])
+        allow(spells[0]).to receive(:playable?).and_return([true, [1,1], ['G', 'G']])
 
-        price, bit_spells, bit_lands = 
-          planner.dfs(1, spells, lands, bit_spells, bit_lands, price)
+        price, bit_spells, bit_lands, land_symbols  = 
+          planner.dfs(1, spells, lands, bit_spells, bit_lands, price, [])
 
         expect(price).to eq(2)
         expect(bit_spells).to eq (1)
         expect(bit_lands).to eq (3)
+        expect(land_symbols).to eq (['G','G'])
       end
     end
 
-    context "when a two playable spell are provided," do
+    context "when two playable spell are provided," do
       it "is expect to be present match" do 
         lands = [build(:swamp), build(:swamp)]
         spells = [build(:blackmail), build(:blackmail)]
@@ -89,15 +92,14 @@ RSpec.describe Planner do
         price = 0
 
         planner = Planner.new
-        allow(spells[0]).to receive(:playable?).and_return([true, [1]])
-        allow(spells[1]).to receive(:playable?).and_return([true, [1]])
 
-        price, bit_spells, bit_lands = 
-          planner.dfs(1, spells, lands, bit_spells, bit_lands, price)
+        price, bit_spells, bit_lands, land_symbols  = 
+          planner.dfs(1, spells, lands, bit_spells, bit_lands, price, [])
 
         expect(price).to eq(2)
         expect(bit_spells).to eq (3)
         expect(bit_lands).to eq (3)
+        expect(land_symbols).to eq (['B', 'B'])
       end
     end
   end
@@ -166,103 +168,33 @@ RSpec.describe Planner do
     end
   end
 
-  describe "#update_bit" do
-    
-    it "when one land is used,update bit to 1" do
-      used_lands = [1]
-      bit_lands = 0
-
-      planner = Planner.new
-      result = planner.update_bit(used_lands, bit_lands)
-
-      expect(result).to eq(1)
-    end
-
-    it "when one land is not used,dont update bit " do
-      used_lands = [0]
-      bit_lands = 0
-
-      planner = Planner.new
-      result = planner.update_bit(used_lands, bit_lands)
-
-      expect(result).to eq(0)
-    end
-
-    it "when one land is not used,dont update bit " do
-      used_lands = [0]
-      bit_lands = 1
-
-      planner = Planner.new
-      result = planner.update_bit(used_lands, bit_lands)
-
-      expect(result).to eq(1)
-    end
-
-    it "when two lands are used,update bit to 3" do
-      used_lands = [1, 1]
-      bit_lands = 0
-
-      planner = Planner.new
-      result = planner.update_bit(used_lands, bit_lands)
-
-      expect(result).to eq(3)
-    end
-
-    it "when one of two land are used,update bit" do
-      used_lands = [0, 1]
-      bit_lands = 0
-
-      planner = Planner.new
-      result = planner.update_bit(used_lands, bit_lands)
-
-      expect(result).to eq(2)
-    end
-
-    it "when one of two land are used,update bit" do
-      used_lands = [1, 0]
-      bit_lands = 0
-
-      planner = Planner.new
-      result = planner.update_bit(used_lands, bit_lands)
-
-      expect(result).to eq(1)
-    end
-
-    it "when one of two land are used,update bit" do
-      used_lands = [0, 1]
-      bit_lands = 1
-
-      planner = Planner.new
-      result = planner.update_bit(used_lands, bit_lands)
-
-      expect(result).to eq(3)
-    end
-  end
-
   describe "#search_opt_spells" do
     it "" do
       play_land = build(:swamp)
       hands = [ build(:blackmail) ]
       planner = Planner.new
-      price, spells = planner.search_opt_spells(hands, [play_land])
+      price, spells, symbols = planner.search_opt_spells(hands, [play_land])
       expect(price).to eq(0)
       expect(spells).to eq([hands[0]])
+      expect(symbols).to eq(["B"])
     end
 
     it "is play two one mana spell" do
       hands = [build(:blackmail), build(:blackmail)]
       planner = Planner.new
-      price, spells = planner.search_opt_spells(hands, [ build(:swamp), build(:swamp) ])
+      price, spells,symbols = planner.search_opt_spells(hands, [ build(:swamp), build(:swamp) ])
       expect(spells[0]).to eq(hands[0])
       expect(spells[1]).to eq(hands[1])
+      expect(symbols).to eq(["B", "B"])
     end
 
     it "" do
       hands = [build(:blackmail)]
       planner = Planner.new
-      price, spells = planner.search_opt_spells(hands, [build(:forest)])
+      price, spells ,symbols = planner.search_opt_spells(hands, [build(:forest)])
       expect(price).to eq(0)
       expect(spells).to eq([])
+      expect(symbols).to eq([])
     end
   end
 
@@ -313,28 +245,6 @@ RSpec.describe Planner do
       drops = planner.plan(hands, [build(:swamp)])
       expect(drops[0]).to eq(hands[0])
       expect(drops[1]).to eq(hands[2])
-    end
-  end
-
-  describe "#reverse_bit" do
-    it "" do
-      planner = Planner.new
-      expect(planner.reverse_bit(0, 1)).to eq(1)
-    end
-
-    it "" do
-      planner = Planner.new
-      expect(planner.reverse_bit(0, 0)).to eq(0)
-    end
-
-    it "" do
-      planner = Planner.new
-      expect(planner.reverse_bit(3, 2)).to eq(0)
-    end
-    
-    it "" do
-      planner = Planner.new
-      expect(planner.reverse_bit(0, 2)).to eq(3)
     end
   end
 

@@ -101,9 +101,18 @@ int main() {
 extern "C" {
   
   void Init_ford_fulkerson() {
+
+    Data_Type<Edge<int>> rb_cEdge =
+      define_class<Edge<int>>("Edge")
+      .define_attr("rev", &Edge<int>::rev, Rice::AttrAccess::Read)
+      .define_attr("from", &Edge<int>::from, Rice::AttrAccess::Read)
+      .define_attr("to", &Edge<int>::to, Rice::AttrAccess::Read)
+      .define_attr("cap", &Edge<int>::cap, Rice::AttrAccess::Read);
+
     Data_Type<Graph<int>> rb_cGraph =
       define_class<Graph<int>>("Graph")
       .define_constructor(Constructor<Graph<int>, int>(), (Arg("n")))
+      .define_attr("G", &Graph<int>::G, Rice::AttrAccess::Read)
       .define_method("add_edge", &Graph<int>::add_edge);
 
     Data_Type<FordFulkerson<int>> rb_cFordFulkerson =

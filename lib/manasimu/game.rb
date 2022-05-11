@@ -3,6 +3,7 @@ class Game
 
   def initialize(deck)
     @deck = deck.shuffle(random: Random.new)
+    @deck.each { |card| card.reset }
     @hands = []
     @plays = []
     @planner = Planner.new

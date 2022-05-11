@@ -25,4 +25,8 @@ FactoryBot.define do
   factory :forest_type, class: CardType do
     contents { [association(:forest_content)] }
   end
+
+  factory :darkbore_pathway_type, class: CardType do
+    contents { [association(:darkbore_pathway_content), association(:slitherbore_pathway_content)] }
+  end
 end

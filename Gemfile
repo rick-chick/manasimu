@@ -6,6 +6,7 @@ gem 'bundler'
 
 gem 'rspec'
 gem 'factory_bot'
+gem 'rake'
 gem 'guard'
 gem 'guard-rspec'
 gem 'debug'

@@ -4,7 +4,7 @@ RSpec.describe Card do
   describe "#playable?" do
     it "return false if lands is empty" do
       card = build(:black_creature)
-      flg, used = card.playable?([])
+      flg, used, symbols = card.playable?([], [])
       expect(flg).to eq(false)
       expect(used).to eq([])
     end
@@ -45,14 +45,60 @@ RSpec.describe Card do
         [4, 8],
       ]
       allow(card).to receive(:edges).and_return([4, 4, edges])
-      flg, used = card.playable?(lands)
+      capas = ["1", "1", "1", "1"]
+      flg, used, symbols = card.playable?(lands, capas)
       expect(flg).to eq(true)
       expect(used).to eq([1,1,1,1])
+      expect(symbols).to eq(['B', '1','1','1'])
+    end
+
+    it "return true if lands has enough mana but no capacity" do
+      lands = 4.times.to_a.map { build(:swamp) }
+      card = build(:black_creature)
+      # suppose
+      #  lands B B B B
+      #  mana_cost B 3
+      edges = [
+        # source to lands
+        [0, 1],
+        [0, 2],
+        [0, 3],
+        [0, 4],
+        # mana_cost to destination
+        [5, 9],
+        [6, 9],
+        [7, 9],
+        [8, 9],
+        # lands to mana_cost
+        [1, 5],
+        [1, 6],
+        [1, 7],
+        [1, 8],
+        [2, 5],
+        [2, 6],
+        [2, 7],
+        [2, 8],
+        [3, 5],
+        [3, 6],
+        [3, 7],
+        [3, 8],
+        [4, 5],
+        [4, 6],
+        [4, 7],
+        [4, 8],
+      ]
+      allow(card).to receive(:edges).and_return([4, 4, edges])
+      capas = ["1", "1", "0", "1"]
+      flg, used, symbols = card.playable?(lands, capas)
+      expect(flg).to eq(false)
+      expect(used).to eq([1,1,1,1])
+      expect(symbols).to eq(['1', '1', nil,'1'])
     end
 
     it "return false if lands dont have enough mana" do
       lands = 3.times.to_a.map { build(:swamp) }
       card = build(:black_creature)
+      capas = ["1", "1", "1"]
       # suppose
       #  lands B B B
       #  mana_cost B 3
@@ -81,9 +127,10 @@ RSpec.describe Card do
         [3, 7],
       ]
       allow(card).to receive(:edges).and_return([3, 4, edges])
-      flg, used = card.playable?(lands)
+      flg, used, land_symbols  = card.playable?(lands, capas)
       expect(flg).to eq(false)
       expect(used).to eq([])
+      expect(land_symbols).to eq([])
     end
 
     it "return false if lands dont have same symbol mana" do
@@ -105,9 +152,55 @@ RSpec.describe Card do
         [8, 9],
       ]
       allow(card).to receive(:edges).and_return([4, 4, edges])
-      flg, used = card.playable?(lands)
+      capas = ["1", "1", "1", "1"]
+      flg, used, land_symbols  = card.playable?(lands, capas)
       expect(flg).to eq(false)
       expect(used).to eq([1,1,1,0])
+      expect(land_symbols).to eq(['1', '1', '1', nil])
+    end
+
+    it "return true if there is one mana spell and one land" do
+      lands = 1.times.to_a.map { build(:swamp) }
+      card = build(:blackmail)
+      # suppose
+      #  lands B
+      #  mana_cost B
+      edges = [
+        # source to lands
+        [0, 1],
+        # lands to mana_cost
+        [1, 2],
+        # mana_cost to destination
+        [2, 3]
+      ]
+      allow(card).to receive(:edges).and_return([1, 1, edges])
+      capas = ["1"]
+      flg, used, land_symbols  = card.playable?(lands, capas)
+      expect(flg).to eq(true)
+      expect(used).to eq([1])
+      expect(land_symbols).to eq(['B'])
+    end
+
+    it "return false if there is one mana spell and one land but no capacity" do
+      lands = 1.times.to_a.map { build(:swamp) }
+      card = build(:blackmail)
+      # suppose
+      #  lands B
+      #  mana_cost B
+      edges = [
+        # source to lands
+        [0, 1],
+        # lands to mana_cost
+        [1, 2],
+        # mana_cost to destination
+        [2, 3]
+      ]
+      allow(card).to receive(:edges).and_return([1, 1, edges])
+      capas = ["0"]
+      flg, used, land_symbols  = card.playable?(lands, capas)
+      expect(flg).to eq(false)
+      expect(used).to eq([0])
+      expect(land_symbols).to eq([nil])
     end
 
   end
@@ -117,7 +210,8 @@ RSpec.describe Card do
       it "given one swamp and one black mana spell, create connected edge" do
         card = build(:blackmail)
         lands = [build(:swamp)]
-        expect(card.edges(lands)).to eq([
+        capas = ["1"]
+        expect(card.edges(lands, capas)).to eq([
           1, 1,
           [
             [0, 1],
@@ -129,7 +223,8 @@ RSpec.describe Card do
       it "given two swamps and one black mana spell, create connected edge" do
         card = build(:blackmail)
         lands = 2.times.to_a.map {build(:swamp)}
-        expect(card.edges(lands)).to eq([
+        capas = ["1", "1"]
+        expect(card.edges(lands, capas)).to eq([
           2, 1,
           [
             [0, 1],
@@ -145,7 +240,8 @@ RSpec.describe Card do
         lands = [
           build(:swamp), build(:forest)
         ]
-        expect(card.edges(lands)).to eq([
+        capas = ["1", "1"]
+        expect(card.edges(lands, capas)).to eq([
           2, 1,
           [
             # source -> lands
@@ -161,7 +257,8 @@ RSpec.describe Card do
       it "given two forest and green mana spell, create connected edge" do
         card = build(:naturalize)
         lands = [build(:forest), build(:forest)]
-        expect(card.edges(lands)).to eq([
+        capas = ["1", "1"]
+        expect(card.edges(lands, capas)).to eq([
           2,2,
           [
             # source -> lands
@@ -181,7 +278,8 @@ RSpec.describe Card do
       it "given swamp,forest and green mana spell, create connected edge" do
         card = build(:naturalize)
         lands = [build(:swamp), build(:forest)]
-        expect(card.edges(lands)).to eq(
+        capas = ["1", "1"]
+        expect(card.edges(lands, capas)).to eq(
             [
             2, 2, [
               # source -> lands
@@ -200,7 +298,8 @@ RSpec.describe Card do
       it "given swamp,forest and multicolor spell, create connected edge" do
         card = build(:spiritmonger)
         lands = [build(:swamp), build(:forest), build(:forest), build(:forest), build(:forest)]
-        expect(card.edges(lands)).to eq(
+        capas = ["1", "1", "1", "1", "1"]
+        expect(card.edges(lands, capas)).to eq(
         [ 5, 5, 
         [
           # source -> lands
@@ -239,6 +338,17 @@ RSpec.describe Card do
         ]]
         )
       end
+    end
+  end
+
+  describe "#reset" do
+    it "should reset played card side" do
+      card = build(:black_creature)
+      card.played(3, "a")
+      expect(card.side).to eq "a"
+
+      card.reset()
+      expect(card.side).to eq nil
     end
   end
 end

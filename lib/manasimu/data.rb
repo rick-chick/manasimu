@@ -70,7 +70,11 @@ class Deck
       card_type = @@card_types.find(deck_item[:set], deck_item[:setnum])
       clone = CardType.create(card_type, deck_item[:name])
       card_types << clone
-      card = Card.new(clone)
+      if clone.name =~ /.*Pathway$/ and clone.mana_source?
+        card = PathwayCard.new(clone)
+      else
+        card = Card.new(clone)
+      end
       deck_item[:amount].to_i.times do 
         card_clone = card.dup
         card_clone.id = card_id
