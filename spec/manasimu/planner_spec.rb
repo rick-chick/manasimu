@@ -19,6 +19,41 @@ RSpec.describe Planner do
         expect(planner.plan(hands, fields)).to eq(hands[0..0])
       end
     end
+
+    context "when tapland is played" do
+      it "can't play its turn" do
+        planner = Planner.new
+        hands = [build(:jungle_hollow_card), build(:blackmail)]
+        hands.each do |card|
+          card.drawed(1)
+        end
+        fields = []
+        expect(planner.plan(hands, fields)).to eq([hands[0]])
+      end
+
+      it "can't play its turn " do
+        planner = Planner.new
+        hands = [build(:blackmail)]
+        fields = [build(:jungle_hollow_card)]
+        fields.each do |card|
+          card.drawed(1)
+        end
+        expect(planner.plan(hands, fields)).to eq([])
+      end
+
+      it "can play after step turn" do
+        planner = Planner.new
+        hands = [build(:blackmail)]
+        fields = [build(:jungle_hollow_card)]
+        fields.each do |card|
+          card.drawed(1)
+        end
+        fields.each do |card|
+          card.step(1)
+        end
+        expect(planner.plan(hands, fields)).to eq([hands[0]])
+      end
+    end
   end
 
   describe "#dfs" do

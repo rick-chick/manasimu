@@ -86,7 +86,11 @@ class Planner
     spell = spells[index]
     used_lands = bit_lands.to_s(2).chars
     capas = lands.length.times.to_a.map do |i|
-      used_lands[i] == "1" ? "0" : "1"
+      if used_lands[i] == "1"
+        "0"
+      else
+        lands[i].tapped? ? "0" : "1"
+      end
     end
 
     # shrink

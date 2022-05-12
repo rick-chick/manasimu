@@ -29,4 +29,8 @@ FactoryBot.define do
   factory :darkbore_pathway_card, class: PathwayCard do
     card_type { association(:darkbore_pathway_type) }
   end
+
+  factory :jungle_hollow_card, class: TapLandCard do
+    card_type { association(:jungle_hollow_type) }
+  end
 end

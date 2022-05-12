@@ -97,4 +97,18 @@ FactoryBot.define do
     color_identity { 'B,G'}
     converted_mana_cost {0}
   end
+
+  factory :jungle_hollow_content, class: Content do
+    name  {'Jungle Hollow'}
+    number {'269'}
+    side {''}
+    set_code { 'NEO'}
+    mana_cost { ''}
+    types { 'Land'}
+    text { 'Jungle Hollow enters the battlefield tapped.
+           When Jungle Hollow enters the battlefield, you gain 1 life.
+           {T}: Add {B} or {G}.'}
+    color_identity { 'B,G'}
+    converted_mana_cost {0}
+  end
 end
