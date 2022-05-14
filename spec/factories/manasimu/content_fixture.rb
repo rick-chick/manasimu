@@ -111,4 +111,17 @@ FactoryBot.define do
     color_identity { 'B,G'}
     converted_mana_cost {0}
   end
+
+  factory :deathcap_glade_content, class: Content do
+    name  {'Deathcap Glade'}
+    number {'261'}
+    side {''}
+    set_code { 'VOW'}
+    mana_cost { ''}
+    types { 'Land'}
+    text { 'Deathcap Glade enters the battlefield tapped unless you control two or more other lands.
+           {T}: Add {B} or {G}.'}
+    color_identity { 'B,G'}
+    converted_mana_cost {0}
+  end
 end

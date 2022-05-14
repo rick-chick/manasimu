@@ -22,6 +22,9 @@ class Card
     @card_type.played(turn)
   end
 
+  def resolve(side = "a", hands, plays)
+  end
+
   def played?
     @played.nil?
   end
@@ -74,6 +77,11 @@ class Card
 
   def reset
     @side = nil
+    @tapped = nil
+  end
+
+  def is_land?
+    @card_type.is_land? @side
   end
 
   def max_flow(lands, capas)
@@ -205,6 +213,19 @@ class CardType
 
   def price
     converted_mana_cost
+  end
+
+  def is_land?(side = nil)
+    arr = if side == 'a'
+            [0]
+          elsif side == 'b'
+            [1]
+          else
+            [0,1]
+          end
+    arr.select do |i|
+      @contents[i] and @contents[i].types == "Land"
+    end.length > 0
   end
 
   def playable?(lands, capas)

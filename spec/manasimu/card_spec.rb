@@ -398,11 +398,19 @@ RSpec.describe Card do
   describe "#reset" do
     it "should reset played card side" do
       card = build(:black_creature)
-      card.played(3, "a")
-      expect(card.side).to eq "a"
+      card.played(3, "b")
+      expect(card.side).to eq "b"
 
       card.reset()
       expect(card.side).to eq nil
+    end
+
+    it "should reset tapped status" do
+      card = build(:black_creature)
+      card.played(3, "b")
+
+      card.reset()
+      expect(card.tapped?).to eq false
     end
   end
 end

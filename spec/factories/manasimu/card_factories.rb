@@ -33,4 +33,8 @@ FactoryBot.define do
   factory :jungle_hollow_card, class: TapLandCard do
     card_type { association(:jungle_hollow_type) }
   end
+
+  factory :deathcap_glade_card, class: SlowLandCard do
+    card_type { association(:deathcap_glade_type) }
+  end
 end

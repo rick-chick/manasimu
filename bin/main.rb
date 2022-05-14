@@ -6,7 +6,7 @@ deck, card_types =
   end
 
 config = SimulatorConfig.new
-config.simulations = 1000
+config.simulations = 100
 config.turns = 10
 config.deck = deck
 

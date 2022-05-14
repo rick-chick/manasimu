@@ -31,27 +31,47 @@ RSpec.describe Planner do
         expect(planner.plan(hands, fields)).to eq([hands[0]])
       end
 
-      it "can't play its turn " do
+      it "can't play spell " do
         planner = Planner.new
-        hands = [build(:blackmail)]
-        fields = [build(:jungle_hollow_card)]
-        fields.each do |card|
-          card.drawed(1)
-        end
-        expect(planner.plan(hands, fields)).to eq([])
+        hands = [build(:blackmail), build(:jungle_hollow_card)]
+        fields = []
+        expect(planner.plan(hands, fields)).to eq([hands[1]])
       end
 
       it "can play after step turn" do
         planner = Planner.new
-        hands = [build(:blackmail)]
-        fields = [build(:jungle_hollow_card)]
-        fields.each do |card|
-          card.drawed(1)
+        hands = [build(:blackmail), build(:jungle_hollow_card)]
+        fields = []
+        expect(planner.plan(hands, fields)).to eq([hands[1]])
+        hands.each do |card|
+          card.step(2)
         end
-        fields.each do |card|
-          card.step(1)
-        end
+        fields = [hands[1]]
+        hands = [hands[0]]
         expect(planner.plan(hands, fields)).to eq([hands[0]])
+      end
+    end
+
+    context "when slowland is played" do
+      it "plan can't play spell if there is no land," do
+        planner = Planner.new
+        hands = [build(:deathcap_glade_card), build(:blackmail)]
+        fields = []
+        expect(planner.plan(hands, fields)).to eq([hands[0]])
+      end
+
+      it "plan can't play spell if there is a land," do
+        planner = Planner.new
+        hands = [build(:blackmail), build(:deathcap_glade_card)]
+        fields = [build(:forest)]
+        expect(planner.plan(hands, fields)).to eq([hands[1]])
+      end
+
+      it "can play if there is two lands," do
+        planner = Planner.new
+        hands = [build(:blackmail), build(:deathcap_glade_card)]
+        fields = [build(:forest), build(:forest)]
+        expect(planner.plan(hands, fields)).to eq(hands.reverse)
       end
     end
   end

@@ -72,9 +72,12 @@ class Deck
       card_types << clone
       if clone.name =~ /.*Pathway$/ and clone.mana_source?
         card = PathwayCard.new(clone)
-      elsif clone.types[0] == "Land" and 
+      elsif clone.is_land? and 
         clone.contents[0].text =~ /enters the battlefield tapped\./
         card = TapLandCard.new(clone)
+      elsif clone.is_land? and 
+        clone.contents[0].text =~ /enters the battlefield tapped unless you control two or more other lands./
+        card = SlowLandCard.new(clone)
       else
         card = Card.new(clone)
       end

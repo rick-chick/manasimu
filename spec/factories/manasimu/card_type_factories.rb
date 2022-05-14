@@ -32,4 +32,9 @@ FactoryBot.define do
   factory :jungle_hollow_type, class: CardType do
     contents { [association(:jungle_hollow_content)] }
   end
+
+  factory :deathcap_glade_type, class: CardType do
+    contents { [association(:deathcap_glade_content)] }
+  end
+  
 end

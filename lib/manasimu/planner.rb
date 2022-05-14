@@ -18,6 +18,7 @@ class Planner
         # play the land
         current_hands.delete play_land
         current_fields << play_land
+        play_land.resolve(nil, current_hands, current_fields)
 
         # search_opt_spells
         price, spells, symbols, lands = 
@@ -29,6 +30,8 @@ class Planner
           max_symbols = symbols
           max_lands = lands
         end
+
+        play_land.reset
       end
     else
       # search_opt_spells

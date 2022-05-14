@@ -42,7 +42,8 @@ class Game
 
   def play(card, turn)
     # puts "play #{card}"
-    card.played(turn)
+    card.resolve(nil, @hands, @plays)
+    card.played(turn, nil)
     @plays << card
     @hands.delete card
   end

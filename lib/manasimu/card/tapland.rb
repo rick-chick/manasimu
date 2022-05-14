@@ -4,12 +4,15 @@ class TapLandCard < Card
     @tapped
   end
 
-  def drawed(turn)
-    super(turn)
+  def resolve(side, hands, plays)
     @tapped = true
   end
 
   def step(turn)
+    @tapped = false
+  end
+
+  def reset
     @tapped = false
   end
 end
