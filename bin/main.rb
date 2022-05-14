@@ -14,8 +14,9 @@ simulator = Simulator.new(config)
 simulator.run
 
 card_types.each do |spell|
-  played, drawed = spell.count()
+  played, drawed, can_played = spell.count()
   played_in_game = played.to_f / config.simulations * 100
   played_if_draw = played.to_f / drawed * 100
-  puts "#{spell.name} : #{played_if_draw.round(1)} #{played_in_game.round(1)}"
+  can_played_if_draw = can_played.to_f / drawed * 100
+  puts "#{spell.name} : #{played_if_draw.round(1)} #{played_in_game.round(1)} #{can_played_if_draw.round(1)}"
 end

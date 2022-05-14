@@ -3,9 +3,12 @@ class Card
 
   def initialize(card_type)
     @card_type = card_type
+    @playable = false
   end
 
   def step(turn)
+    @card_type.step(turn - 1, self)
+    @can_play = false
   end
 
   def drawed(turn)
@@ -32,7 +35,13 @@ class Card
   end
 
   def playable?(lands, capas)
-    @card_type.playable?(lands, capas)
+    ret = @card_type.playable?(lands, capas)
+    @can_play = true if ret and ret[0]
+    ret
+  end
+
+  def can_play?
+    @can_play
   end
 
   def types
@@ -88,19 +97,23 @@ class Card
 end
 
 class CardType
-  attr_accessor :contents, :played, :drawed, :name
+  attr_accessor :contents, :played, :drawed, :name, :can_plays
 
   def self.create(card_type, name)
     ret = card_type.dup
     ret.contents = card_type.contents
-    ret.played = nil
-    ret.drawed = nil
+    ret.played = {}
+    ret.drawed = {}
+    ret.can_plays = {}
     ret.name = name
     ret
   end
 
   def initialize(contents)
     return if not contents
+    @played = {}
+    @drawed = {}
+    @can_plays = {}
     @contents = contents.map {|c| Content.new(c)}
   end
 
@@ -108,14 +121,19 @@ class CardType
     @name ||= @contents[0].name
   end
 
+  def step(turn, card)
+    if turn >= 0 and card.can_play?
+      @can_plays[turn] ||= 0
+      @can_plays[turn] += 1
+    end
+  end
+
   def played(turn)
-    @played ||= {}
     @played[turn] ||= 0
     @played[turn] += 1
   end
 
   def drawed(turn)
-    @drawed ||= {}
     @drawed[turn] ||= 0
     @drawed[turn] += 1
   end
@@ -266,15 +284,13 @@ class CardType
 
   def count(turn = nil)
     turn ||= converted_mana_cost
-    played = @played ? @played [turn] : 0
+    played = @played [turn] || 0
     drawed = 0
-    if (@drawed)
-      (turn+1).times do |i|
-        next if not @drawed[i]
-        drawed += @drawed[i]
-      end
+    (turn+1).times do |i|
+      drawed += @drawed[i] || 0
     end
-    [played, drawed]
+    can_played = @can_plays[turn] || 0
+    [played, drawed, can_played]
   end
 
   def to_s

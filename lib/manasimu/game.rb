@@ -25,6 +25,7 @@ class Game
   end
 
   def upkeep(turn)
+    @hands.each { |card| card.step(turn) }
     @plays.each { |card| card.step(turn) }
   end
 
