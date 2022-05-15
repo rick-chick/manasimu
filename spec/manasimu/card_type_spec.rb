@@ -40,7 +40,7 @@ RSpec.describe CardType do
         card1 = Card.new(card_type)
         land = build(:swamp)
         card1.playable?([land], ["1"])
-        card1.step_in_hands(2)
+        card1.step_in_hands(1)
         played, drawed, can_played, mana_sources  = card_type.count(1)
         expect(can_played).to eq 1
       end
@@ -54,8 +54,8 @@ RSpec.describe CardType do
         land = build(:swamp)
         card1.playable?([land], ["1"])
         card2.playable?([land], ["1"])
-        card1.step_in_hands(2)
-        card2.step_in_hands(2)
+        card1.step_in_hands(1)
+        card2.step_in_hands(1)
         played, drawed, can_played, mana_sources  = card_type.count(1)
         expect(can_played).to eq 2
       end
@@ -70,7 +70,7 @@ RSpec.describe CardType do
         card_type = build(:swamp_type)
         card1 = Card.new(card_type)
         card1.resolve(nil, [], [])
-        card1.step_in_plays(2)
+        card1.step_in_plays(1)
         played, drawed, can_played, mana_sources  = card_type.count(1)
         expect(mana_sources["B"]).to eq 1
         expect(mana_sources.keys.length).to eq 1
@@ -89,8 +89,8 @@ RSpec.describe CardType do
         card_type = build(:jungle_hollow_type)
         card1 = TapLandCard.new(card_type)
         card1.resolve(nil, [], [])
+        card1.step_in_plays(1)
         card1.step_in_plays(2)
-        card1.step_in_plays(3)
         played, drawed, can_played, mana_sources  = card_type.count(2)
         expect(mana_sources.keys.length).to eq 2
         expect(mana_sources["B"]).to eq 0.5

@@ -1,8 +1,12 @@
 class Game
   attr_accessor :hands, :plays, :deck
 
-  def initialize(deck)
-    @deck = deck.shuffle(random: Random.new)
+  def initialize(deck, shuffle = true)
+    if shuffle 
+      @deck = deck.shuffle(random: Random.new)
+    else
+      @deck = deck
+    end
     @deck.each { |card| card.reset }
     @hands = []
     @plays = []
@@ -17,15 +21,12 @@ class Game
     # puts "hands"
     # @hands.each do |card| puts " #{card}" end
 
-    upkeep(turn)
     draw(turn)
+    play_cards = plan;
+    @hands.each { |card| card.step_in_hands(turn) }
     plan.each do |card| 
       play(card, turn)
     end
-  end
-
-  def upkeep(turn)
-    @hands.each { |card| card.step_in_hands(turn) }
     @plays.each { |card| card.step_in_plays(turn) }
   end
 

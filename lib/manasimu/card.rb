@@ -7,12 +7,12 @@ class Card
   end
 
   def step_in_hands(turn)
-    @card_type.step_in_hands(turn - 1, self)
+    @card_type.step_in_hands(turn, self)
     @can_play = false
   end
 
   def step_in_plays(turn)
-    @card_type.step_in_plays(turn - 1, self)
+    @card_type.step_in_plays(turn, self)
   end
 
   def drawed(turn)
@@ -140,14 +140,14 @@ class CardType
   end
 
   def step_in_hands(turn, card)
-    if turn >= 0 and card.can_play?
+    if card.can_play?
       @can_plays[turn] ||= 0
       @can_plays[turn] += 1
     end
   end
 
   def step_in_plays(turn, card)
-    if turn >= 0 and card.mana_source? and not card.tapped?
+    if card.mana_source? and not card.tapped?
       @mana_sources[turn] ||= {}
       size = card.color_identity.length
       card.color_identity.each do |c|
@@ -328,14 +328,14 @@ class CardType
 
   def count(turn = nil)
     turn ||= converted_mana_cost
-    played = @played [turn] || 0
-    drawed = 0
+    played_count = @played[turn] || 0
+    drawed_count = 0
     (turn+1).times do |i|
-      drawed += @drawed[i] || 0
+      drawed_count += @drawed[i] || 0
     end
-    can_played = @can_plays[turn] || 0
-    mana_sources = @mana_sources[turn] || {}
-    [played, drawed, can_played, mana_sources]
+    can_played_count = @can_plays[turn] || 0
+    mana_sources_count = @mana_sources[turn] || {}
+    [played_count, drawed_count, can_played_count, mana_sources_count]
   end
 
   def to_s
