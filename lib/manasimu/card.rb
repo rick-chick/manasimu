@@ -19,7 +19,9 @@ class Card
   def played(turn, side = "a")
     @played = turn
     @side = side
-    @card_type.played(turn)
+    if not is_land? or not tapped?
+      @card_type.played(turn)
+    end
   end
 
   def resolve(side = "a", hands, plays)
@@ -77,7 +79,9 @@ class Card
 
   def reset
     @side = nil
-    @tapped = nil
+    @played = nil
+    @drawed = nil
+    @can_play = false
   end
 
   def is_land?

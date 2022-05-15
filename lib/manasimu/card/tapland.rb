@@ -13,6 +13,7 @@ class TapLandCard < Card
   end
 
   def reset
+    super
     @tapped = false
   end
 end

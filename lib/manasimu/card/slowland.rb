@@ -24,6 +24,7 @@ class SlowLandCard < Card
   end
 
   def reset
+    super
     @tapped = false
   end
 end
