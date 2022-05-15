@@ -44,7 +44,7 @@ RSpec.describe Planner do
         fields = []
         expect(planner.plan(hands, fields)).to eq([hands[1]])
         hands.each do |card|
-          card.step(2)
+          card.step_in_plays(2)
         end
         fields = [hands[1]]
         hands = [hands[0]]

@@ -25,8 +25,8 @@ class Game
   end
 
   def upkeep(turn)
-    @hands.each { |card| card.step(turn) }
-    @plays.each { |card| card.step(turn) }
+    @hands.each { |card| card.step_in_hands(turn) }
+    @plays.each { |card| card.step_in_plays(turn) }
   end
 
   def draw(turn)

@@ -1,6 +1,7 @@
 class SlowLandCard < Card
 
   def resolve(side, hands, plays)
+    super(side, hands, plays)
     num = 0
     for card in plays do
       next if card == self
@@ -15,7 +16,8 @@ class SlowLandCard < Card
     end
   end
 
-  def step(turn)
+  def step_in_plays(turn)
+    super(turn)
     @tapped = false
   end
 

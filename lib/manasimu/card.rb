@@ -6,9 +6,13 @@ class Card
     @playable = false
   end
 
-  def step(turn)
-    @card_type.step(turn - 1, self)
+  def step_in_hands(turn)
+    @card_type.step_in_hands(turn - 1, self)
     @can_play = false
+  end
+
+  def step_in_plays(turn)
+    @card_type.step_in_plays(turn - 1, self)
   end
 
   def drawed(turn)
@@ -109,7 +113,7 @@ class Card
 end
 
 class CardType
-  attr_accessor :contents, :played, :drawed, :name, :can_plays
+  attr_accessor :contents, :played, :drawed, :name, :can_plays, :mana_sources
 
   def self.create(card_type, name)
     ret = card_type.dup
@@ -117,6 +121,7 @@ class CardType
     ret.played = {}
     ret.drawed = {}
     ret.can_plays = {}
+    ret.mana_sources = {}
     ret.name = name
     ret
   end
@@ -126,6 +131,7 @@ class CardType
     @played = {}
     @drawed = {}
     @can_plays = {}
+    @mana_sources = {}
     @contents = contents.map {|c| Content.new(c)}
   end
 
@@ -133,10 +139,21 @@ class CardType
     @name ||= @contents[0].name
   end
 
-  def step(turn, card)
+  def step_in_hands(turn, card)
     if turn >= 0 and card.can_play?
       @can_plays[turn] ||= 0
       @can_plays[turn] += 1
+    end
+  end
+
+  def step_in_plays(turn, card)
+    if turn >= 0 and card.mana_source? and not card.tapped?
+      @mana_sources[turn] ||= {}
+      size = card.color_identity.length
+      card.color_identity.each do |c|
+        @mana_sources[turn][c] ||= 0
+        @mana_sources[turn][c] += 1.0 / size
+      end
     end
   end
 
@@ -220,6 +237,7 @@ class CardType
   end
 
   def is_land?(side = nil)
+    return @is_land if @is_land
     arr = if side == 'a'
             [0]
           elsif side == 'b'
@@ -227,9 +245,10 @@ class CardType
           else
             [0,1]
           end
-    arr.select do |i|
+    @is_land = arr.select do |i|
       @contents[i] and @contents[i].types == "Land"
     end.length > 0
+    return @is_land
   end
 
   def playable?(lands, capas)
@@ -315,7 +334,8 @@ class CardType
       drawed += @drawed[i] || 0
     end
     can_played = @can_plays[turn] || 0
-    [played, drawed, can_played]
+    mana_sources = @mana_sources[turn] || {}
+    [played, drawed, can_played, mana_sources]
   end
 
   def to_s

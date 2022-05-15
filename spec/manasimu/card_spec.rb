@@ -344,7 +344,7 @@ RSpec.describe Card do
   describe "#can_play?" do
     it "should be false if card step turn" do
       blackmail = build(:blackmail)
-      blackmail.step(1)
+      blackmail.step_in_hands(1)
       expect(blackmail.can_play?).to eq false
     end
 
@@ -354,7 +354,7 @@ RSpec.describe Card do
         .to receive('playable?')
         .and_return [false, [], []]
       blackmail = Card.new(blackmail_type)
-      blackmail.step(1)
+      blackmail.step_in_hands(1)
       blackmail.playable?(nil, nil)
       expect(blackmail.can_play?).to eq false
     end
@@ -365,7 +365,7 @@ RSpec.describe Card do
         .to receive('playable?')
         .and_return [true, [], []]
       blackmail = Card.new(blackmail_type)
-      blackmail.step(1)
+      blackmail.step_in_hands(1)
       blackmail.playable?(nil, nil)
       expect(blackmail.can_play?).to eq true
     end
@@ -374,7 +374,7 @@ RSpec.describe Card do
       blackmail_type = build(:blackmail_type)
       blackmail = Card.new(blackmail_type)
 
-      blackmail.step(1)
+      blackmail.step_in_hands(1)
 
       allow(blackmail_type)
         .to receive('playable?')
