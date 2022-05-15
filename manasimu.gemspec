@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'manasimu'
-  s.version     = '0.0.13'
-  s.date        = '2022-05-14'
+  s.version     = '0.0.14'
+  s.date        = '2022-05-15'
   s.summary     = "mtg arrena mana curve simulator"
   s.description = "mtg arrena mana curve simulator"
   s.authors     = ["so1itaryrove"]
