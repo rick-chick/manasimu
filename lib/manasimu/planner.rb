@@ -68,7 +68,7 @@ class Planner
     end
 
     lands.sort! do |a, b|
-      b.color_identity_size <=> a.color_identity_size
+      b.mana_source_size <=> a.mana_source_size
     end
 
     price = 0

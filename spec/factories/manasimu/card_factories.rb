@@ -37,4 +37,8 @@ FactoryBot.define do
   factory :deathcap_glade_card, class: SlowLandCard do
     card_type { association(:deathcap_glade_type) }
   end
+
+  factory :obscura_storefront_card, class: SncFetchLandCard do
+    card_type { association(:obscura_storefront_type) }
+  end
 end

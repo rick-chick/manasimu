@@ -39,6 +39,14 @@ class Card
     false
   end
 
+  def mana_source
+    @card_type.mana_source
+  end
+
+  def mana_source_size
+    @card_type.mana_source_size
+  end
+
   def mana_source?
     @card_type.mana_source?
   end
@@ -55,10 +63,6 @@ class Card
 
   def types
     @card_type.types
-  end
-
-  def mana
-    @card_type.mana
   end
 
   def color_identity
@@ -149,8 +153,8 @@ class CardType
   def step_in_plays(turn, card)
     if card.mana_source? and not card.tapped?
       @mana_sources[turn] ||= {}
-      size = card.color_identity.length
-      card.color_identity.each do |c|
+      size = card.mana_source.length
+      card.mana_source.each do |c|
         @mana_sources[turn][c] ||= 0
         @mana_sources[turn][c] += 1.0 / size
       end
@@ -167,16 +171,34 @@ class CardType
     @drawed[turn] += 1
   end
 
+  def mana_source
+    @mana_source ||= @contents.map {|content| content.color_identity.split(',') }.flatten.uniq
+  end
+
+  def mana_source_size
+    (a = mana_source) ? a.size : 0
+  end
+
   def mana_source?
-    @mana_source ||= @contents.any? {|content| content.mana_source?}
+    @is_mana_source ||= @contents.any? {|content| content.mana_source?}
+  end
+
+  def mana_cost
+    return @mana_cost if @mana_cost
+    spell = @contents.select {|c| c.types != "Land"}.first
+    if spell
+      @mana_cost = spell.mana_cost
+    else
+      @mana_cost = '0'
+    end
+  end
+
+  def converted_mana_cost
+    @converted_mana_cost ||= @contents.map {|c| c.converted_mana_cost}.min
   end
 
   def types
     @types ||= @contents.map {|c| c.types}
-  end
-
-  def mana
-    @mana ||= @contents.map {|content| content.color_identity }.flatten
   end
 
   def color_identity
@@ -190,22 +212,8 @@ class CardType
     @memo_colors
   end
 
-  def converted_mana_cost
-    @converted_mana_cost ||= @contents.map {|c| c.converted_mana_cost}.min
-  end
-
   def color_identity_size
     color_identity.length
-  end
-
-  def mana_cost
-    return @mana_cost if @mana_cost
-    spell = @contents.select {|c| c.types != "Land"}.first
-    if spell
-      @mana_cost = spell.mana_cost
-    else
-      @mana_cost = '0'
-    end
   end
 
   def symbols
@@ -307,7 +315,7 @@ class CardType
     # lands and mana_cost connect to each symbols
     lands.each_with_index do |land, i|
       next if capas[i].to_i == 0
-      land_colors = land.color_identity
+      land_colors = land.mana_source
       symbols.each_with_index do |symbol, j|
         if symbol == "1" or land_colors.include? symbol
           result << [i + 1, x + 1 + j]

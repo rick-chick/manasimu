@@ -36,5 +36,9 @@ FactoryBot.define do
   factory :deathcap_glade_type, class: CardType do
     contents { [association(:deathcap_glade_content)] }
   end
+
+  factory :obscura_storefront_type, class: CardType do
+    contents { [association(:obscura_storefront_type)] }
+  end
   
 end

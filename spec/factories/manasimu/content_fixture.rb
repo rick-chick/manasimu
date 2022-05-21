@@ -124,4 +124,16 @@ FactoryBot.define do
     color_identity { 'B,G'}
     converted_mana_cost {0}
   end
+
+  factory :obscura_storefront_content, class: Content do
+    name  {'Obscura Storefront'}
+    number {'252'}
+    side {''}
+    set_code { 'SNC'}
+    mana_cost { ''}
+    types { 'Land'}
+    text { 'When Obscura Storefront enters the battlefield, sacrifice it. When you do, search your library for a basic Plains, Island, or Swamp card, put it onto the battlefield tapped, then shuffle and you gain 1 life.'}
+    color_identity { ''}
+    converted_mana_cost {0}
+  end
 end

@@ -15,11 +15,12 @@ class PathwayCard  < Card
     end
   end
 
-  def color_identity
+  def mana_source
     if @side
       [@symbol]
     else
       @card_type.color_identity
     end
   end
+
 end

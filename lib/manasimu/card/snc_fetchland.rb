@@ -1,0 +1,2 @@
+class SncFetchLandCard < Card
+end
