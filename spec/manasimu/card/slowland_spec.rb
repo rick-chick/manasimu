@@ -5,7 +5,8 @@ RSpec.describe SlowLandCard do
     context "when any lands are played before," do
       it "should be tapped after resolve" do
         card = build(:deathcap_glade_card)
-        card.resolve(nil, [], [])
+        deck = nil
+        card.resolve(nil, [], [], deck)
         expect(card.tapped?).to eq true
       end
     end
@@ -14,7 +15,8 @@ RSpec.describe SlowLandCard do
       it "should be tapped after resolve" do
         land = build(:swamp)
         card = build(:deathcap_glade_card)
-        card.resolve(nil, [], [land])
+        deck = nil
+        card.resolve(nil, [], [land], deck)
         expect(card.tapped?).to eq true
       end
     end
@@ -23,7 +25,8 @@ RSpec.describe SlowLandCard do
       it "should not be tapped after resolve" do
         lands = [build(:swamp), build(:forest)]
         card = build(:deathcap_glade_card)
-        card.resolve(nil, [], lands)
+        deck = nil
+        card.resolve(nil, [], lands, deck)
         expect(card.tapped?).to eq false
       end
     end
@@ -32,7 +35,8 @@ RSpec.describe SlowLandCard do
       it "should not be tapped after resolve" do
         lands = [build(:swamp)]
         card = build(:deathcap_glade_card)
-        card.resolve(nil, [], lands)
+        deck = nil
+        card.resolve(nil, [], lands, deck)
         expect(card.tapped?).to eq true
         card.reset
         expect(card.tapped?).to eq false

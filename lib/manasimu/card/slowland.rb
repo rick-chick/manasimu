@@ -1,7 +1,7 @@
 class SlowLandCard < Card
 
-  def resolve(side, hands, plays)
-    super(side, hands, plays)
+  def resolve(side, hands, plays, deck)
+    super(side, hands, plays, deck)
     num = 0
     for card in plays do
       next if card == self

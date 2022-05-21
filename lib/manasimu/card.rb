@@ -28,7 +28,7 @@ class Card
     end
   end
 
-  def resolve(side = "a", hands, plays)
+  def resolve(side = "a", hands, plays, deck)
   end
 
   def played?

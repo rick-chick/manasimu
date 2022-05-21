@@ -38,12 +38,12 @@ class Game
   end
 
   def plan
-    @planner.plan(@hands, @plays)
+    @planner.plan(@hands, @plays, @deck)
   end
 
   def play(card, turn)
     # puts "play #{card}"
-    card.resolve(nil, @hands, @plays)
+    card.resolve(nil, @hands, @plays, @deck)
     card.played(turn, nil)
     @plays << card
     @hands.delete card

@@ -4,8 +4,8 @@ class TapLandCard < Card
     @tapped
   end
 
-  def resolve(side, hands, plays)
-    super(side, hands, plays)
+  def resolve(side, hands, plays, deck)
+    super(side, hands, plays, deck)
     @tapped = true
   end
 

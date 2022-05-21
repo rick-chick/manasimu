@@ -1,6 +1,6 @@
 class Planner
 
-  def plan(hands, fields)
+  def plan(hands, fields, deck)
     lands_in_hand = lands(hands)
 
     max_price =  0
@@ -14,11 +14,12 @@ class Planner
         # dup
         current_hands = hands.dup
         current_fields = fields.dup
+        current_deck = deck.dup
 
         # play the land
         current_hands.delete play_land
         current_fields << play_land
-        play_land.resolve(nil, current_hands, current_fields)
+        play_land.resolve(nil, current_hands, current_fields, current_deck)
 
         # search_opt_spells
         price, spells, symbols, lands = 

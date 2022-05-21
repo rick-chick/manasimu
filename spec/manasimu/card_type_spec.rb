@@ -79,7 +79,7 @@ RSpec.describe CardType do
       it "should return 0 if tapland is step plays" do
         card_type = build(:jungle_hollow_type)
         card1 = TapLandCard.new(card_type)
-        card1.resolve(nil, [], [])
+        card1.resolve(nil, [], [], nil)
         card1.step_in_plays(2)
         played, drawed, can_played, mana_sources  = card_type.count(1)
         expect(mana_sources.keys.length).to eq 0
@@ -88,7 +88,7 @@ RSpec.describe CardType do
       it "should return 2 if two color tapland step 2 turn in plays" do
         card_type = build(:jungle_hollow_type)
         card1 = TapLandCard.new(card_type)
-        card1.resolve(nil, [], [])
+        card1.resolve(nil, [], [], nil)
         card1.step_in_plays(1)
         card1.step_in_plays(2)
         played, drawed, can_played, mana_sources  = card_type.count(2)
