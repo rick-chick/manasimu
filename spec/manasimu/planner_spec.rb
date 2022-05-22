@@ -8,7 +8,7 @@ RSpec.describe Planner do
         hands = [build(:swamp), build(:naturalize)]
         fields = []
         deck = nil
-        expect(planner.plan(hands, fields, deck)).to eq(hands[0..0])
+        expect(planner.plan(hands, fields, deck)).to eq([hands[0..0], nil])
       end
     end
 
@@ -18,7 +18,7 @@ RSpec.describe Planner do
         hands = [build(:naturalize)]
         fields = [build(:forest), build(:forest)]
         deck = nil
-        expect(planner.plan(hands, fields, deck)).to eq(hands[0..0])
+        expect(planner.plan(hands, fields, deck)).to eq([hands[0..0], nil])
       end
     end
 
@@ -31,7 +31,7 @@ RSpec.describe Planner do
         end
         fields = []
         deck = nil
-        expect(planner.plan(hands, fields, deck)).to eq([hands[0]])
+        expect(planner.plan(hands, fields, deck)).to eq([[hands[0]], nil])
       end
 
       it "can't play spell " do
@@ -39,7 +39,7 @@ RSpec.describe Planner do
         hands = [build(:blackmail), build(:jungle_hollow_card)]
         fields = []
         deck = nil
-        expect(planner.plan(hands, fields, deck)).to eq([hands[1]])
+        expect(planner.plan(hands, fields, deck)).to eq([[hands[1]], nil])
       end
 
       it "can play after step turn" do
@@ -47,14 +47,14 @@ RSpec.describe Planner do
         hands = [build(:blackmail), build(:jungle_hollow_card)]
         fields = []
         deck = nil
-        expect(planner.plan(hands, fields, deck)).to eq([hands[1]])
+        expect(planner.plan(hands, fields, deck)).to eq([[hands[1]], nil])
         hands.each do |card|
           card.step_in_plays(2)
         end
         fields = [hands[1]]
         hands = [hands[0]]
         deck = nil
-        expect(planner.plan(hands, fields, deck)).to eq([hands[0]])
+        expect(planner.plan(hands, fields, deck)).to eq([[hands[0]],nil])
       end
     end
 
@@ -64,7 +64,7 @@ RSpec.describe Planner do
         hands = [build(:deathcap_glade_card), build(:blackmail)]
         fields = []
         deck = nil
-        expect(planner.plan(hands, fields, deck)).to eq([hands[0]])
+        expect(planner.plan(hands, fields, deck)).to eq([[hands[0]], nil])
       end
 
       it "plan can't play spell if there is a land," do
@@ -72,7 +72,7 @@ RSpec.describe Planner do
         hands = [build(:blackmail), build(:deathcap_glade_card)]
         fields = [build(:forest)]
         deck = nil
-        expect(planner.plan(hands, fields, deck)).to eq([hands[1]])
+        expect(planner.plan(hands, fields, deck)).to eq([[hands[1]], nil])
       end
 
       it "can play if there is two lands," do
@@ -80,7 +80,7 @@ RSpec.describe Planner do
         hands = [build(:blackmail), build(:deathcap_glade_card)]
         fields = [build(:forest), build(:forest)]
         deck = nil
-        expect(planner.plan(hands, fields, deck)).to eq(hands.reverse)
+        expect(planner.plan(hands, fields, deck)).to eq([hands.reverse, nil])
       end
     end
   end
@@ -268,7 +268,7 @@ RSpec.describe Planner do
       planner = Planner.new
       deck = nil
       drops = planner.plan(hands, [], deck)
-      expect(drops).to eq(hands)
+      expect(drops).to eq([hands, nil])
     end
 
     it "" do
@@ -276,7 +276,7 @@ RSpec.describe Planner do
       planner = Planner.new
       deck = nil
       drops = planner.plan(hands, [], deck)
-      expect(drops).to eq([hands[0]])
+      expect(drops).to eq([[hands[0]], nil])
     end
 
     it "" do
@@ -284,8 +284,8 @@ RSpec.describe Planner do
       planner = Planner.new
       deck = nil
       drops = planner.plan(hands, [], deck)
-      expect(drops[0]).to eq(hands[0])
-      expect(drops[1]).to eq(hands[2])
+      expect(drops[0][0]).to eq(hands[0])
+      expect(drops[0][1]).to eq(hands[2])
     end
 
     it "" do
@@ -293,9 +293,9 @@ RSpec.describe Planner do
       planner = Planner.new
       deck = nil
       drops = planner.plan(hands, [build(:swamp)], deck)
-      expect(drops[0]).to eq(hands[0])
-      expect(drops[1]).to eq(hands[1])
-      expect(drops[2]).to eq(hands[2])
+      expect(drops[0][0]).to eq(hands[0])
+      expect(drops[0][1]).to eq(hands[1])
+      expect(drops[0][2]).to eq(hands[2])
     end
 
     it "" do
@@ -303,9 +303,9 @@ RSpec.describe Planner do
       planner = Planner.new
       deck = nil
       drops = planner.plan(hands, [build(:swamp)], deck)
-      expect(drops[0]).to eq(hands[0])
-      expect(drops[1]).to eq(hands[1])
-      expect(drops[2]).to eq(nil)
+      expect(drops[0][0]).to eq(hands[0])
+      expect(drops[0][1]).to eq(hands[1])
+      expect(drops[0][2]).to eq(nil)
     end
 
     it "" do
@@ -313,8 +313,8 @@ RSpec.describe Planner do
       planner = Planner.new
       deck = nil
       drops = planner.plan(hands, [build(:swamp)], deck)
-      expect(drops[0]).to eq(hands[0])
-      expect(drops[1]).to eq(hands[2])
+      expect(drops[0][0]).to eq(hands[0])
+      expect(drops[0][1]).to eq(hands[2])
     end
   end
 

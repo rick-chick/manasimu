@@ -43,15 +43,17 @@ class Planner
       max_land = lands_in_hand[0]
     end
 
+    deck = nil
     if max_lands
       max_lands.each_with_index do |land, i|
         if not land.mana_produced? and max_symbols[i]
           land.first_produce_symbol = max_symbols[i]
+          deck = land.deck if land.respond_to? :deck
         end
       end
     end
 
-    [max_land, max_spells].select {|a| a}.flatten
+    [[max_land, max_spells].select {|a| a}.flatten, deck]
   end
 
   #

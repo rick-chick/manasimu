@@ -18,7 +18,7 @@ class Game
   def step(turn)
     if @debugg
       puts "---------------------------------"
-      puts "turn #{turn} deck #{@deck.length}"
+      puts "turn #{turn} basic_lands #{@deck.select {|c| c.instance_of? BasicLandCard}.length}"
       puts "played"
       @plays.each do |card| puts " #{card}" end
       puts "hands"
@@ -26,11 +26,12 @@ class Game
     end
 
     draw(turn)
-    play_cards = plan;
+    play_cards, deck = plan;
     @hands.each { |card| card.step_in_hands(turn) }
-    plan.each do |card| 
+    play_cards.each do |card| 
       play(card, turn)
     end
+    deck = deck if deck
     @plays.each { |card| card.step_in_plays(turn) }
   end
 
@@ -53,8 +54,6 @@ class Game
     end
 
     card.resolve(nil, @hands, @plays, @deck)
-    @deck = card.deck if card.respond_to? :deck
-
     card.played(turn, nil)
     @plays << card
     @hands.delete card

@@ -26,11 +26,12 @@ puts
 puts "mana curve"
 mana_curves = {}
 card_types.map do |card|
-  if card.mana_source?
+  if card.mana_sources and card.mana_sources.any?
+    colors = card.mana_sources.map {|t, v| v.keys}.flatten.uniq
     10.times do |i|
       turn = i + 1
       played, drawed, can_play, mana_sources = card.count(turn)
-      card.color_identity.each do |c|
+      colors.each do |c|
         mana_curves[c] ||= {}
         mana_curves[c][turn] ||= 0
         mana_curves[c][turn] += mana_sources[c].to_f / config.simulations
