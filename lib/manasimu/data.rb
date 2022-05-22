@@ -77,6 +77,9 @@ class Deck
           card = TapLandCard.new(clone)
         elsif clone.contents[0].text =~ /enters the battlefield tapped unless you control two or more other lands./
           card = SlowLandCard.new(clone)
+        elsif clone.text =~ /earch your library for a basic land card, put it onto the battlefield tapped, then shuffle/
+          card = FetchLandCard.new(clone)
+          card.configure
         elsif clone.set_code == 'SNC' and 
           clone.contents[0].text =~ /enters the battlefield, sacrifice it/
           card = SncFetchLandCard.new(clone)

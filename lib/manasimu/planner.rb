@@ -46,7 +46,6 @@ class Planner
     if max_lands
       max_lands.each_with_index do |land, i|
         if not land.mana_produced? and max_symbols[i]
-          debugger if max_symbols[i].nil?
           land.first_produce_symbol = max_symbols[i]
         end
       end

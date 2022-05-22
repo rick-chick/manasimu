@@ -1,5 +1,4 @@
-class SncFetchLandCard < TapLandCard
-
+class FetchLandCard < TapLandCard
   attr_accessor :deck
 
   def resolve(side, hands, plays, deck)
@@ -41,12 +40,11 @@ class SncFetchLandCard < TapLandCard
   end
 
   def mana_source
-    raise Exception.new('you should resolve first') if not @fetch_source
-    @fetch_source
+    ManaType.all.map {|t| t.color }
   end
 
   def configure
-    mana_types = ManaType.search_text_by_land_type(card_type.text)
+    mana_types = ManaType.all
     @mana_source = mana_types.map {|mana_type| mana_type.color}.flatten.uniq
     @fetched = false
     self
