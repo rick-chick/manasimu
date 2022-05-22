@@ -86,7 +86,7 @@ RSpec.describe SncFetchLandCard do
         land.resolve(nil, hands, plays, deck)
         land.first_produce_symbol = "U"
         expect(deck.length).to eq 1
-        expect(deck[0].mana_source).to eq ["U"]
+        expect(deck[0].mana_source).to eq ["B"]
       end
     end
 

@@ -17,7 +17,8 @@ class Game
 
   def step(turn)
     if @debugg
-      puts "turn #{turn}"
+      puts "---------------------------------"
+      puts "turn #{turn} deck #{@deck.length}"
       puts "played"
       @plays.each do |card| puts " #{card}" end
       puts "hands"
@@ -50,7 +51,10 @@ class Game
     if @debugg
       puts "play #{card}"
     end
+
     card.resolve(nil, @hands, @plays, @deck)
+    @deck = card.deck if card.respond_to? :deck
+
     card.played(turn, nil)
     @plays << card
     @hands.delete card

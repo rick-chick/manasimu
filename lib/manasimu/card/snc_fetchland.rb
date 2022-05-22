@@ -1,5 +1,7 @@
 class SncFetchLandCard < TapLandCard
 
+  attr_accessor :deck
+
   def resolve(side, hands, plays, deck)
     super(side, hands, plays, deck)
     return @fetch_source if @fetch_source
@@ -19,12 +21,20 @@ class SncFetchLandCard < TapLandCard
 
   def first_produce_symbol=(color)
     super(color)
-    basic_land = @fetches.select {|card| @mana_source.include? color}.first
-    if @deck and basic_land
-      @deck.delete basic_land
-      @deck.shuffle!
-      @fetch_source = [color]
-      @fetches = [basic_land]
+    if @deck
+      basic_land = @deck
+        .select { |card| card.instance_of? BasicLandCard }
+        .select { |card| color.to_i.to_s == color || card.mana_source.include?(color) }
+        .first
+      if basic_land
+        @deck.delete basic_land
+        @deck.shuffle!
+        @fetch_source = [color]
+        @fetches = [basic_land]
+      else
+        debugger
+        raise Exception.new('basic land is empty')
+      end
     else
       []
     end
