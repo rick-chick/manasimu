@@ -70,14 +70,22 @@ class Deck
       card_type = @@card_types.find(deck_item[:set], deck_item[:setnum])
       clone = CardType.create(card_type, deck_item[:name])
       card_types << clone
-      if clone.name =~ /.*Pathway$/ and clone.mana_source?
-        card = PathwayCard.new(clone)
-      elsif clone.is_land? and 
-        clone.contents[0].text =~ /enters the battlefield tapped\./
-        card = TapLandCard.new(clone)
-      elsif clone.is_land? and 
-        clone.contents[0].text =~ /enters the battlefield tapped unless you control two or more other lands./
-        card = SlowLandCard.new(clone)
+      if clone.is_land?
+        if clone.name =~ /.*Pathway$/
+          card = PathwayCard.new(clone)
+        elsif clone.contents[0].text =~ /enters the battlefield tapped\./
+          card = TapLandCard.new(clone)
+        elsif clone.contents[0].text =~ /enters the battlefield tapped unless you control two or more other lands./
+          card = SlowLandCard.new(clone)
+        elsif clone.set_code == 'SNC' and 
+          clone.contents[0].text =~ /enters the battlefield, sacrifice it/
+          card = SncFetchLandCard.new(clone)
+          card.configure
+        elsif clone.type[0] =~ /^Basic Land — .*$/
+          card = BasicLandCard.new(clone)
+        else
+          card = Card.new(clone)
+        end
       else
         card = Card.new(clone)
       end

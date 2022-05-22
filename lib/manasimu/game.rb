@@ -1,7 +1,7 @@
 class Game
   attr_accessor :hands, :plays, :deck
 
-  def initialize(deck, shuffle = true)
+  def initialize(deck, shuffle = true, debugg = false)
     if shuffle 
       @deck = deck.shuffle(random: Random.new)
     else
@@ -11,15 +11,18 @@ class Game
     @hands = []
     @plays = []
     @planner = Planner.new
+    @debugg = debugg
     7.times { draw(0) }
   end
 
   def step(turn)
-    # puts "turn #{turn}"
-    # puts "played"
-    # @plays.each do |card| puts " #{card}" end
-    # puts "hands"
-    # @hands.each do |card| puts " #{card}" end
+    if @debugg
+      puts "turn #{turn}"
+      puts "played"
+      @plays.each do |card| puts " #{card}" end
+      puts "hands"
+      @hands.each do |card| puts " #{card}" end
+    end
 
     draw(turn)
     play_cards = plan;
@@ -32,7 +35,9 @@ class Game
 
   def draw(turn)
     card = @deck.pop
-    # puts "draw #{card}"
+    if @debugg
+      puts "draw #{card}"
+    end
     card.drawed(turn)
     @hands << card
   end
@@ -42,7 +47,9 @@ class Game
   end
 
   def play(card, turn)
-    # puts "play #{card}"
+    if @debugg
+      puts "play #{card}"
+    end
     card.resolve(nil, @hands, @plays, @deck)
     card.played(turn, nil)
     @plays << card

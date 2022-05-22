@@ -26,6 +26,18 @@ FactoryBot.define do
     contents { [association(:forest_content)] }
   end
 
+  factory :plains_type, class: CardType do
+    contents { [association(:plains_content)] }
+  end
+
+  factory :mountain_type, class: CardType do
+    contents { [association(:mountain_content)] }
+  end
+
+  factory :island_type, class: CardType do
+    contents { [association(:island_content)] }
+  end
+
   factory :darkbore_pathway_type, class: CardType do
     contents { [association(:darkbore_pathway_content), association(:slitherbore_pathway_content)] }
   end
@@ -38,7 +50,7 @@ FactoryBot.define do
   end
 
   factory :obscura_storefront_type, class: CardType do
-    contents { [association(:obscura_storefront_type)] }
+    contents { [association(:obscura_storefront_content)] }
   end
   
 end

@@ -11,3 +11,6 @@ gem 'guard-rspec'
 gem 'debug'
 gem 'gem-ctags'
 
+group :test, :development do
+  gem 'sqlite3'
+end

@@ -2,8 +2,10 @@ Gemfile.lock
 db/AllPrintings.sqlite
 *.gem
 *.txt
+tags
 .tags
 .Gemfile.lock.tags
 .bundle
 vendor
 tmp
+tmp.log

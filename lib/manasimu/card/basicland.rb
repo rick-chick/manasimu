@@ -1,0 +1,3 @@
+class BasicLandCard < Card
+
+end

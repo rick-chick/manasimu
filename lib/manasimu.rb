@@ -1,7 +1,9 @@
 require 'bundler'
 Bundler.require
 
+require_relative './manasimu/mana_type.rb'
 require_relative './manasimu/card.rb'
+require_relative './manasimu/card/basicland.rb'
 require_relative './manasimu/card/pathway.rb'
 require_relative './manasimu/card/tapland.rb'
 require_relative './manasimu/card/slowland.rb'

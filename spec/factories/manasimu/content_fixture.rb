@@ -6,6 +6,7 @@ FactoryBot.define do
     side {''}
     set_code { '9ED'}
     mana_cost { '{B}'}
+    type { 'Sorcery'}
     types { 'Sorcery'}
     text { 'Target player reveals three cards from their hand and you choose one of them. That player discards that card.'}
     color_identity { 'B'}
@@ -18,6 +19,7 @@ FactoryBot.define do
     side {''}
     set_code { '10E'}
     mana_cost { '{1}{G}'}
+    type { 'Instant'}
     types { 'Instant'}
     text { ''}
     color_identity { 'G'}
@@ -30,6 +32,7 @@ FactoryBot.define do
     side {''}
     set_code { 'APC'}
     mana_cost { '{3}{B}{G}'}
+    type { 'Creature — Beast'}
     types { 'Creature'}
     text { 'Whenever Spiritmonger deals damage to a creature, put a +1/+1 counter on Spiritmonger.
     {B}: Regenerate Spiritmonger.
@@ -44,6 +47,7 @@ FactoryBot.define do
     side {''}
     set_code { 'MB1'}
     mana_cost { '{3}{B}'}
+    type { 'Creature — Orc Warrior'}
     types { 'Creature'}
     text { '{1}{W}: Unyielding Krumar gains first strike until end of turn.'}
     color_identity { 'B,W'}
@@ -56,6 +60,7 @@ FactoryBot.define do
     side {''}
     set_code { 'M15'}
     mana_cost { ''}
+    type { 'Basic Land — Swamp'}
     types { 'Land'}
     text { '({T}: Add {B}.)'}
     color_identity { 'B'}
@@ -68,10 +73,50 @@ FactoryBot.define do
     side {''}
     set_code { '10E'}
     mana_cost { ''}
+    type { 'Basic Land — Forest'}
     types { 'Land'}
     text { '({T}: Add {G}.)'}
     color_identity { 'G'}
     converted_mana_cost { 0}
+  end
+
+  factory 'plains_content', class: Content do
+    name  {'Plains'}
+    number {'283'}
+    side {''}
+    set_code { 'NEO'}
+    mana_cost { ''}
+    type { 'Basic Land — Plains'}
+    types { 'Land'}
+    text { '({T}: Add {W}.)'}
+    color_identity { 'W'}
+    converted_mana_cost {0}
+  end
+
+  factory 'island_content', class: Content do
+    name  {'Island'}
+    number {'285'}
+    side {''}
+    set_code { 'NEO'}
+    mana_cost { ''}
+    type { 'Basic Land — Island'}
+    types { 'Land'}
+    text { '({T}: Add {U}.)'}
+    color_identity { 'U'}
+    converted_mana_cost {0}
+  end
+
+  factory 'mountain_content', class: Content do
+    name  {'Mountain'}
+    number {'289'}
+    side {''}
+    set_code { 'NEO'}
+    mana_cost { ''}
+    type { 'Basic Land — Mountain'}
+    types { 'Land'}
+    text { '({T}: Add {R}.)'}
+    color_identity { 'R'}
+    converted_mana_cost {0}
   end
 
   factory :darkbore_pathway_content, class: Content do
@@ -80,6 +125,7 @@ FactoryBot.define do
     side {'a'}
     set_code { 'KHM'}
     mana_cost { ''}
+    type { 'Land'}
     types { 'Land'}
     text { '{T}: Add {B}.'}
     color_identity { 'B,G'}
@@ -92,6 +138,7 @@ FactoryBot.define do
     side {'b'}
     set_code { 'KHM'}
     mana_cost { ''}
+    type { 'Land'}
     types { 'Land'}
     text { '{T}: Add {G}.'}
     color_identity { 'B,G'}
@@ -104,6 +151,7 @@ FactoryBot.define do
     side {''}
     set_code { 'NEO'}
     mana_cost { ''}
+    type { 'Land'}
     types { 'Land'}
     text { 'Jungle Hollow enters the battlefield tapped.
            When Jungle Hollow enters the battlefield, you gain 1 life.
@@ -118,6 +166,7 @@ FactoryBot.define do
     side {''}
     set_code { 'VOW'}
     mana_cost { ''}
+    type { 'Land'}
     types { 'Land'}
     text { 'Deathcap Glade enters the battlefield tapped unless you control two or more other lands.
            {T}: Add {B} or {G}.'}
@@ -131,9 +180,11 @@ FactoryBot.define do
     side {''}
     set_code { 'SNC'}
     mana_cost { ''}
+    type { 'Land'}
     types { 'Land'}
     text { 'When Obscura Storefront enters the battlefield, sacrifice it. When you do, search your library for a basic Plains, Island, or Swamp card, put it onto the battlefield tapped, then shuffle and you gain 1 life.'}
     color_identity { ''}
     converted_mana_cost {0}
   end
+
 end

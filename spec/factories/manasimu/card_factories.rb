@@ -18,12 +18,24 @@ FactoryBot.define do
     card_type { association(:blackmail_type) }
   end
 
-  factory :swamp, class: Card do
+  factory :swamp, class: BasicLandCard do
     card_type { association(:swamp_type) }
   end
 
-  factory :forest, class: Card do
+  factory :forest, class: BasicLandCard do
     card_type { association(:forest_type) }
+  end
+
+  factory :mountain, class: BasicLandCard do
+    card_type { association(:mountain_type) }
+  end
+
+  factory :island, class: BasicLandCard do
+    card_type { association(:island_type) }
+  end
+
+  factory :plains, class: BasicLandCard do
+    card_type { association(:plains_type) }
   end
 
   factory :darkbore_pathway_card, class: PathwayCard do

@@ -6,6 +6,9 @@ class Card
     @playable = false
   end
 
+  def configure
+  end
+
   def step_in_hands(turn)
     @card_type.step_in_hands(turn, self)
     @can_play = false
@@ -65,6 +68,10 @@ class Card
     @card_type.types
   end
 
+  def type
+    @card_type.type
+  end
+
   def color_identity
     @card_type.color_identity
   end
@@ -109,6 +116,10 @@ class Card
   end
 
   def first_produce_symbol=(symbol)
+  end
+
+  def set_code
+    @card_type.set_code
   end
 
   def to_s
@@ -172,7 +183,9 @@ class CardType
   end
 
   def mana_source
-    @mana_source ||= @contents.map {|content| content.color_identity.split(',') }.flatten.uniq
+    @mana_source ||= @contents.map { |c| 
+        c.color_identity ? c.color_identity.split(',') : []
+      }.flatten.uniq
   end
 
   def mana_source_size
@@ -197,6 +210,14 @@ class CardType
     @converted_mana_cost ||= @contents.map {|c| c.converted_mana_cost}.min
   end
 
+  def text
+    @text ||= @contents.map {|c| c.text}.flatten.join('')
+  end
+
+  def type
+    @type ||= @contents.map {|c| c.type}.flatten.uniq
+  end
+
   def types
     @types ||= @contents.map {|c| c.types}
   end
@@ -205,8 +226,10 @@ class CardType
     return @memo_colors if @memo_colors
     @memo_colors ||= []
     @contents.each do |c|
-      c.color_identity.split(",").each do |color|
-        @memo_colors << color if not @memo_colors.include? color
+      if c.color_identity
+        c.color_identity.split(",").each do |color|
+          @memo_colors << color if not @memo_colors.include? color
+        end
       end
     end
     @memo_colors
@@ -242,6 +265,10 @@ class CardType
 
   def price
     converted_mana_cost
+  end
+
+  def set_code
+    @contents[0].set_code
   end
 
   def is_land?(side = nil)
@@ -349,6 +376,10 @@ class CardType
   def to_s
     @contents.map {|c| c.to_s}.join(",")
   end
+
+  def to_factory
+    @contents.map {|c| c.to_factory}
+  end
 end
 
 class CardTypeAggregate
@@ -376,7 +407,7 @@ class CardTypeAggregate
 end
 
 class Content
-  attr_accessor :name, :number, :side, :set_code, :mana_cost, :types, :color_identity, :converted_mana_cost, :text
+  attr_accessor :name, :number, :side, :set_code, :mana_cost, :type, :types, :color_identity, :converted_mana_cost, :text
 
   def initialize(hash)
     @name = hash[:name]
@@ -385,6 +416,7 @@ class Content
     @set_code = hash[:set_code]
     @mana_cost = hash[:mana_cost]
     @types = hash[:types]
+    @type = hash[:type]
     @text = hash[:text]
     @color_identity = hash[:color_identity]
     @converted_mana_cost = hash[:converted_mana_cost].to_i
@@ -396,6 +428,23 @@ class Content
 
   def to_s
     "[#{@name}] [#{@types}] [#{@color_identity}] [#{@mana_cost}]"
+  end
+
+  def to_factory
+    <<EOF
+  factory '#{@name.underscore}_content', class: Content do
+    name  {'#{@name}'}
+    number {'#{@number}'}
+    side {'#{@side}'}
+    set_code { '#{@set_code}'}
+    mana_cost { '#{@mana_cost}'}
+    type { '#{@type}'}
+    types { '#{@types}'}
+    text { '#{@text}'}
+    color_identity { '#{@color_identity}'}
+    converted_mana_cost {#{@converted_mana_cost}}
+  end
+EOF
   end
 
 end

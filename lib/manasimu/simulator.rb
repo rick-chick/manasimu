@@ -6,7 +6,7 @@ class Simulator
 
   def run
     @config.simulations.times do
-      game = Game.new(@config.deck)
+      game = Game.new(@config.deck, true, @config.debugg)
       @config.turns.times do |i|
         turn = i + 1
         game.step turn
@@ -16,5 +16,8 @@ class Simulator
 end
 
 class SimulatorConfig
-  attr_accessor :simulations, :turns, :deck
+  attr_accessor :simulations, :turns, :deck, :debugg
+  def initialize
+    @debugg = false
+  end
 end
