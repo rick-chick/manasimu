@@ -72,13 +72,13 @@ class Deck
     distinct_types = []
     types.each do |type|
       next if distinct_types[-1] and distinct_types[-1].name == type.name
-      type.name.downcase!
+      type.name
       distinct_types << type
     end
 
     ret = []
     lines.each do |line|
-      line.chomp!.downcase!
+      line.chomp!
       search_type = distinct_types.bsearch do |type|
         name = type.name
         flag = true
