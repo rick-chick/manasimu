@@ -60,16 +60,67 @@ class Deck
     result
   end
 
-  def self.get_card_details(deck_items)
+  def self.card_types
     path = File.expand_path( '../../../db/card_type_aggregate', __FILE__ )
     @@card_types ||= Marshal.load(File.open(path, 'r'))
+  end
+
+  def self.find_card_types(lines)
+    types = card_types.map do |a| a end
+    types.sort! do |a,b| a.name <=> b.name end
+
+    distinct_types = []
+    types.each do |type|
+      next if distinct_types[-1] and distinct_types[-1].name == type.name
+      type.name.downcase!
+      distinct_types << type
+    end
+
+    ret = []
+    lines.each do |line|
+      line.chomp!.downcase!
+      search_type = distinct_types.bsearch do |type|
+        name = type.name
+        flag = true
+        name.chars.each_with_index do |nc,i|
+          if line.length > i
+            lc = line.chars[i]
+            if nc > lc
+              flag = true
+              break
+            elsif nc < lc
+              flag = false
+              break
+            else
+              # continue
+            end
+          else
+            flag = true
+            break
+          end
+        end
+        flag
+      end
+      if search_type
+        a = search_type.name
+        if line =~ /^#{a}.*$/ and a != 'x'
+          ret << search_type
+        end
+      end
+    end
+
+    ret.sort! do |a,b| a.mana_cost <=> b.mana_cost end
+    ret.uniq!
+  end
+
+  def self.get_card_details(deck_items)
     cards = []
     card_id = 0
-    card_types = []
+    clone_card_types = []
     deck_items.each do |deck_item|
-      card_type = @@card_types.find(deck_item[:set], deck_item[:setnum])
+      card_type = card_types.find(deck_item[:set], deck_item[:setnum])
       clone = CardType.create(card_type, deck_item[:name])
-      card_types << clone
+      clone_card_types << clone
       if clone.is_land?
         if clone.name =~ /.*Pathway$/
           card = PathwayCard.new(clone)
@@ -99,6 +150,6 @@ class Deck
         cards << card_clone
       end
     end
-    [cards, card_types]
+    [cards, clone_card_types]
   end
 end

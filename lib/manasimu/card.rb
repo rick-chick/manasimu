@@ -404,6 +404,11 @@ class CardTypeAggregate
     end
   end
 
+  def map
+    @memo.map do |item|
+      yield item
+    end
+  end
 end
 
 class Content
