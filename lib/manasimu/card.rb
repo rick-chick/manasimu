@@ -154,6 +154,14 @@ class CardType
     @name ||= @contents[0].name
   end
 
+  def set_code
+    @set_code ||= @contents[0].set_code
+  end
+
+  def number
+    @number ||= @contents[0].number
+  end
+
   def step_in_hands(turn, card)
     if card.can_play?
       @can_plays[turn] ||= 0
