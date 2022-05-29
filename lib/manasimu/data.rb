@@ -83,6 +83,7 @@ class Deck
         name = type.name.split(' // ')[0]
         flag = true
         name.chars.each_with_index do |nc,i|
+
           if line.length > i
             lc = line.chars[i]
             if nc > lc
@@ -109,8 +110,9 @@ class Deck
       end
     end
 
-    ret.sort! do |a,b| a.mana_cost <=> b.mana_cost end
+    ret.sort! do |a,b| a.converted_mana_cost <=> b.converted_mana_cost end
     ret.uniq!
+    ret
   end
 
   def self.get_card_details(deck_items)
