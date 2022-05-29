@@ -80,7 +80,7 @@ class Deck
     lines.each do |line|
       line.chomp!
       search_type = distinct_types.bsearch do |type|
-        name = type.name
+        name = type.name.split(' // ')[0]
         flag = true
         name.chars.each_with_index do |nc,i|
           if line.length > i
@@ -102,8 +102,8 @@ class Deck
         flag
       end
       if search_type
-        a = search_type.name
-        if line =~ /^#{a}.*$/ and a != 'x'
+        a = search_type.name.split(' // ')[0]
+        if line =~ /^#{a}.*$/ and a != 'X'
           ret << search_type
         end
       end
