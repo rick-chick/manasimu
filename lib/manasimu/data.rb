@@ -79,33 +79,41 @@ class Deck
     ret = []
     lines.each do |line|
       line.chomp!
-      search_type = distinct_types.bsearch do |type|
-        name = type.name.split(' // ')[0]
-        flag = true
-        name.chars.each_with_index do |nc,i|
+      [-1, 4].each do |i|
+        search_type = distinct_types.bsearch do |type|
+          if i == -1
+            name = type.name.split(' // ')[0]
+          else
+            next if not type.names[i]
+            name = type.names[i].split(' // ')[0]
+          end
 
-          if line.length > i
-            lc = line.chars[i]
-            if nc > lc
+          flag = true
+          name.chars.each_with_index do |nc,i|
+            if line.length > i
+              lc = line.chars[i]
+              if nc > lc
+                flag = true
+                break
+              elsif nc < lc
+                flag = false
+                break
+              else
+                # continue
+              end
+            else
               flag = true
               break
-            elsif nc < lc
-              flag = false
-              break
-            else
-              # continue
             end
-          else
-            flag = true
+          end
+          flag
+        end
+        if search_type
+          a = search_type.name.split(' // ')[0]
+          if line =~ /^#{a}.*$/ and a != 'X'
+            ret << search_type
             break
           end
-        end
-        flag
-      end
-      if search_type
-        a = search_type.name.split(' // ')[0]
-        if line =~ /^#{a}.*$/ and a != 'X'
-          ret << search_type
         end
       end
     end

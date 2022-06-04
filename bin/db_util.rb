@@ -41,11 +41,12 @@ DOC
   rows.to_a.group_by {|c| [c[1],c[4]] }.each do |key, card|
     puts (i.to_f / length * 100).round(1) if i % 1000 == 0
     i += 1
-    if not card_types.find(card[0][4], card[0][1])
+    if not card_types.find(card[0][4], card[0][1].to_i)
       card_types.add(CardType.new(card.map { |row|
         {
           name: row[0],
-          number: row[1],
+          names: [],
+          number: row[1].to_i,
           color_identity: row[2],
           side: row[3],
           set_code: row[4],

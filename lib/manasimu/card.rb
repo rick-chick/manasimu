@@ -294,6 +294,10 @@ class CardType
     return @is_land
   end
 
+  def names
+    @contents[0].names
+  end
+
   def playable?(lands, capas)
     return [false, [], []] if lands.empty?
     return [false, [], []] if converted_mana_cost > lands.length
@@ -391,17 +395,27 @@ class CardType
 end
 
 class CardTypeAggregate
+  def initialize
+    @memo = []
+  end
 
   def find(set_code, number)
-    @memo ||= []
-    @memo.find do |c|
+    ret = @memo.bsearch do |c|
       a = c.contents[0]
-      a and a.set_code == set_code and a.number == number
+      if set_code == a.set_code
+        number.to_i <= a.number
+      else
+        set_code < a.set_code
+      end
+    end
+    if ret and ret.set_code == set_code and ret.number == number.to_i
+      ret
+    else
+      nil
     end
   end
 
   def add(card_type)
-    @memo ||= []
     @memo << card_type
   end
 
@@ -420,10 +434,11 @@ class CardTypeAggregate
 end
 
 class Content
-  attr_accessor :name, :number, :side, :set_code, :mana_cost, :type, :types, :color_identity, :converted_mana_cost, :text
+  attr_accessor :name, :names, :number, :side, :set_code, :mana_cost, :type, :types, :color_identity, :converted_mana_cost, :text
 
   def initialize(hash)
     @name = hash[:name]
+    @names = hash[:names]
     @number = hash[:number]
     @side = hash[:side]
     @set_code = hash[:set_code]
@@ -447,6 +462,7 @@ class Content
     <<EOF
   factory '#{@name.underscore}_content', class: Content do
     name  {'#{@name}'}
+    names  {'#{@names}'}
     number {'#{@number}'}
     side {'#{@side}'}
     set_code { '#{@set_code}'}
