@@ -75,51 +75,61 @@ class Deck
     end
 
 
-    [-1, 4].each do |i|
+    [-1, 4].each do |j|
 
       distinct_types.sort! do |a,b| 
-        if i < 0
+        if j < 0
           a.name <=> b.name 
-        elsif a.names[i] and b.names[i]
-          a.names[i] <=> b.names[i]
-        else
+        elsif a.names[j] and b.names[j]
+          a.names[j] <=> b.names[j]
+        elsif not a.names[j] and not b.names[j]
           0
+        elsif a.names[j]
+          -1
+        else
+          1
         end
       end
 
       lines.each do |line|
         line.chomp!
         search_type = distinct_types.bsearch do |type|
-          if i < 0
+          if j < 0
             name = type.name.split(' // ')[0]
-          elsif type.names[i]
-            name = type.names[i].split(' // ')[0]
-          else
-            next
+          elsif type.names[j]
+            name = type.names[j].split(' // ')[0]
           end
 
-          flag = true
-          name.chars.each_with_index do |nc,i|
-            if line.length > i
-              lc = line.chars[i]
-              if nc > lc
+          if name
+            flag = true
+            name.chars.each_with_index do |nc,i|
+              if line.length > i
+                lc = line.chars[i]
+                if nc > lc
+                  flag = true
+                  break
+                elsif nc < lc
+                  flag = false
+                  break
+                else
+                  # continue
+                end
+              else
                 flag = true
                 break
-              elsif nc < lc
-                flag = false
-                break
-              else
-                # continue
               end
-            else
-              flag = true
-              break
             end
+            flag
+          else
+            false
           end
-          flag
         end
         if search_type
-          a = search_type.name.split(' // ')[0]
+          if j < 0
+            a = search_type.name.split(' // ')[0]
+          else
+            a = search_type.names[j].split(' // ')[0]
+          end
           if line =~ /^#{a}.*$/ and a != 'X'
             ret << search_type
           end
