@@ -66,26 +66,36 @@ class Deck
   end
 
   def self.find_card_types(lines)
-    types = card_types.map do |a| a end
-    types.sort! do |a,b| a.name <=> b.name end
+    ret = []
 
     distinct_types = []
-    types.each do |type|
+    card_types.each do |type|
       next if distinct_types[-1] and distinct_types[-1].name == type.name
-      type.name
       distinct_types << type
     end
 
-    ret = []
-    lines.each do |line|
-      line.chomp!
-      [-1, 4].each do |i|
+
+    [-1, 4].each do |i|
+
+      distinct_types.sort! do |a,b| 
+        if i < 0
+          a.name <=> b.name 
+        elsif a.names[i] and b.names[i]
+          a.names[i] <=> b.names[i]
+        else
+          0
+        end
+      end
+
+      lines.each do |line|
+        line.chomp!
         search_type = distinct_types.bsearch do |type|
-          if i == -1
+          if i < 0
             name = type.name.split(' // ')[0]
-          else
-            next if not type.names[i]
+          elsif type.names[i]
             name = type.names[i].split(' // ')[0]
+          else
+            next
           end
 
           flag = true
@@ -112,7 +122,6 @@ class Deck
           a = search_type.name.split(' // ')[0]
           if line =~ /^#{a}.*$/ and a != 'X'
             ret << search_type
-            break
           end
         end
       end
