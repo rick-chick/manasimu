@@ -192,7 +192,7 @@ class CardType
 
   def mana_source
     @mana_source ||= @contents.map { |c| 
-        c.color_identity ? c.color_identity.split(',') : []
+        c.color_identity ? c.color_identity : []
       }.flatten.uniq
   end
 
@@ -206,7 +206,7 @@ class CardType
 
   def mana_cost
     return @mana_cost if @mana_cost
-    spell = @contents.select {|c| c.types != "Land"}.first
+    spell = @contents.select {|c| not c.types.include? "Land"}.first
     if spell
       @mana_cost = spell.mana_cost
     else
@@ -227,7 +227,7 @@ class CardType
   end
 
   def types
-    @types ||= @contents.map {|c| c.types}
+    @types ||= @contents.map {|c| c.types}.flatten
   end
 
   def color_identity
@@ -235,7 +235,7 @@ class CardType
     @memo_colors ||= []
     @contents.each do |c|
       if c.color_identity
-        c.color_identity.split(",").each do |color|
+        c.color_identity.each do |color|
           @memo_colors << color if not @memo_colors.include? color
         end
       end
@@ -289,7 +289,7 @@ class CardType
             [0,1]
           end
     @is_land = arr.select do |i|
-      @contents[i] and @contents[i].types == "Land"
+      @contents[i] and @contents[i].types.include? "Land"
     end.length > 0
     return @is_land
   end
@@ -476,7 +476,7 @@ class Content
   end
 
   def mana_source?
-    return @types == "Land"
+    return @types.include? "Land"
   end
 
   def to_s

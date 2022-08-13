@@ -12,6 +12,7 @@ config.deck = deck
 config.debugg = true
 
 simulator = Simulator.new(config)
+
 simulator.run
 
 card_types.each do |spell|
