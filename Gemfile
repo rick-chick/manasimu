@@ -10,6 +10,7 @@ gem 'guard'
 gem 'guard-rspec'
 gem 'debug'
 gem 'gem-ctags'
+gem 'nokogiri' 
 
 group :test, :development do
   gem 'sqlite3'

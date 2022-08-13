@@ -74,64 +74,144 @@ class Deck
       distinct_types << type
     end
 
+    en = -1
+    ja = 0
 
-    [-1, 4].each do |j|
+    [en, ja].each do |language|
 
       distinct_types.sort! do |a,b| 
-        if j < 0
+        if language == en
           a.name <=> b.name 
-        elsif a.names[j] and b.names[j]
-          a.names[j] <=> b.names[j]
-        elsif not a.names[j] and not b.names[j]
-          0
-        elsif a.names[j]
-          -1
+        elsif language == ja
+          d = a.name_ja_split.length <=> b.name_ja_split.length
+          if d == 0
+            a.name_ja_split <=> b.name_ja_split
+          else
+            d
+          end
         else
-          1
+          # none
         end
       end
 
       lines.each do |line|
         line.chomp!
-        search_type = distinct_types.bsearch do |type|
-          if j < 0
-            name = type.name.split(' // ')[0]
-          elsif type.names[j]
-            name = type.names[j].split(' // ')[0]
-          end
+        line.chomp.strip!
+        line.chomp.lstrip!
+        line.gsub!(/ \d+$/, '')
 
-          if name
-            flag = true
-            name.chars.each_with_index do |nc,i|
-              if line.length > i
-                lc = line.chars[i]
-                if nc > lc
+        if line =~ /^[\/,\|\d-]*$/ or line =~ /^x\d+$/
+          next 
+        end
+
+        search_type = 
+          if language == en
+            # binary search
+            distinct_types.bsearch do |type|
+              name = type.name.split(' // ')[0]
+              flag = true
+              name.chars.each_with_index do |nc,i|
+                if line.length > i
+                  lc = line.chars[i]
+                  if nc > lc
+                    flag = true
+                    break
+                  elsif nc < lc
+                    flag = false
+                    break
+                  else
+                    # continue
+                  end
+                else
                   flag = true
                   break
-                elsif nc < lc
-                  flag = false
-                  break
-                else
-                  # continue
                 end
-              else
-                flag = true
+              end
+              flag
+            end
+          else language == ja
+            # Levenshtein distance
+            
+            line.gsub!(/[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬●〇▼▽▲△]+/, '')
+            line.chomp!
+            line.strip!
+            line.lstrip!
+
+            len = line.length
+
+            s_index = distinct_types.bsearch_index do |type|
+              name = type.name_ja_split
+              name.length >= len - 2
+            end
+
+            e_index = distinct_types.bsearch_index do |type|
+              name = type.name_ja_split
+              name.length >= len + 2
+            end
+
+            next if not s_index
+
+            min = Float::MAX
+            min_type = nil
+
+            distinct_types[s_index..e_index].each do |type|
+              name = type.name_ja_split
+
+              check_indexies = []
+              if name.length == 1
+                check_indexies[0] = 0
+              elsif name.length == 2
+                check_indexies[0] = 0
+                check_indexies[1] = 1
+              elsif name.length > 0
+                check_indexies[0] = 0
+                check_indexies[1] = (name.length / 2).to_i
+                check_indexies[2] = name.length - 1
+              end
+
+              next if check_indexies.length == 0
+
+              include_some = false
+              check_indexies.each do |idx|
+                if not name[idx].empty? and line.index(name[idx])
+                  include_some = true
+                  break
+                end
+              end
+
+              next if not include_some
+
+              d = levenshtein(line, name)
+              base =  [name.length, line.length].max
+              diff_rate =  d.to_f / base
+              if diff_rate < min
+                min = diff_rate
+                min_type = type
+              end
+              if d == 0
                 break
               end
             end
-            flag
-          else
-            false
+
+            result = nil
+
+            if min_type and min <= 0.3
+              result = min_type
+            end
+
+            result
           end
-        end
+
         if search_type
-          if j < 0
+          if language == en
             a = search_type.name.split(' // ')[0]
-          else
-            a = search_type.names[j].split(' // ')[0]
-          end
-          if line =~ /^#{a}.*$/ and a != 'X'
+            if line =~ /^#{a}.*$/ and a != 'X'
+              ret << search_type
+            end
+          elsif language == ja
             ret << search_type
+          else
+            # none
           end
         end
       end
@@ -140,6 +220,25 @@ class Deck
     ret.sort! do |a,b| a.converted_mana_cost <=> b.converted_mana_cost end
     ret.uniq!
     ret
+  end
+
+  def self.tsearch(arr, line, low, high)
+    if high - low < 1000
+      return [low, high]
+    end
+    c1 = ((low * 2 + high ) / 3).to_i - 1
+    c2 = ((low + high * 2 ) / 3).to_i + 1
+
+    n1 = arr[c1].name_ja_split
+    n2 = arr[c2].name_ja_split
+    
+    y1 = levenshtein(line, n1)
+    y2 = levenshtein(line, n2)
+    if y1 > y2
+      tsearch(arr, line, c1, high)
+    else
+      tsearch(arr, line, low, c2)
+    end
   end
 
   def self.get_card_details(deck_items)
@@ -180,5 +279,27 @@ class Deck
       end
     end
     [cards, clone_card_types]
+  end
+
+  def self.levenshtein(first, second)
+    matrix = [(0..first.length).to_a]
+    (1..second.length).each do |j|
+      matrix << [j] + [0] * (first.length)
+    end
+
+    (1..second.length).each do |i|
+      (1..first.length).each do |j|
+        if first[j-1] == second[i-1]
+          matrix[i][j] = matrix[i-1][j-1]
+        else
+          matrix[i][j] = [
+            matrix[i-1][j],
+            matrix[i][j-1],
+            matrix[i-1][j-1],
+          ].min + 1
+        end
+      end
+    end
+    return matrix.last.last
   end
 end

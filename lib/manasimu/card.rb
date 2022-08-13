@@ -298,6 +298,15 @@ class CardType
     @contents[0].names
   end
 
+  @name_ja_split = nil
+  def name_ja_split
+    return @name_ja_split if @name_ja_split
+    c = @contents[0]
+    return "" if not c.names
+    return "" if not c.names[0]
+    @name_ja_split = c.names[0].split(' // ')[0]
+  end
+
   def playable?(lands, capas)
     return [false, [], []] if lands.empty?
     return [false, [], []] if converted_mana_cost > lands.length
@@ -385,6 +394,14 @@ class CardType
     [played_count, drawed_count, can_played_count, mana_sources_count]
   end
 
+  def <=>(o)
+    a = @contents[0]
+    b = o.contents[0]
+    d = a.set_code <=> b.set_code
+    return d if d != 0
+    a.number <=> b.number
+  end
+
   def to_s
     @contents.map {|c| c.to_s}.join(",")
   end
@@ -397,6 +414,10 @@ end
 class CardTypeAggregate
   def initialize
     @memo = []
+  end
+
+  def sort!
+    @memo.sort!
   end
 
   def find(set_code, number)
@@ -413,6 +434,10 @@ class CardTypeAggregate
     else
       nil
     end
+  end
+
+  def length
+    @memo.length
   end
 
   def add(card_type)
@@ -439,7 +464,7 @@ class Content
   def initialize(hash)
     @name = hash[:name]
     @names = hash[:names]
-    @number = hash[:number]
+    @number = hash[:number].to_i
     @side = hash[:side]
     @set_code = hash[:set_code]
     @mana_cost = hash[:mana_cost]
@@ -455,7 +480,7 @@ class Content
   end
 
   def to_s
-    "[#{@name}] [#{@types}] [#{@color_identity}] [#{@mana_cost}]"
+    "[#{@name}] [#{@names}] [#{@types}] [#{@color_identity}] [#{@mana_cost}]"
   end
 
   def to_factory

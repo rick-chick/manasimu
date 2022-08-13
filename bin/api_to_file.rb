@@ -1,21 +1,35 @@
 require_relative '../lib/manasimu.rb'
 require_relative 'api_util.rb'
 
+set_code = nil
 
-prev = File.open(File.expand_path( '../../db/expansions', __FILE__ ), "r") do |file|
-  Marshal.load(file)
-end
+prev = Expansion.load
+card_types = CardTypeAggregate.new
+notfounds = []
+# card_types = Deck.card_types
+# card_types.sort!
+
+sets = get_sets
 
 crnt = []
-get_sets.each do |code, name|
+if set_code
+  inf = sets.find do |set| set[0] == set_code end
+  exit if not inf
   set = Expansion.new
-  set.code = code
-  set.name = name
+  set.code = set_code
+  set.name = inf[1]
   set.exists = false
   crnt << set
+else
+  sets.each do |code, name|
+    set = Expansion.new
+    set.code = code
+    set.name = name
+    set.exists = false
+    crnt << set
+  end
 end
 
-card_types = Deck.card_types
 
 crnt.each do |set|
 
@@ -23,14 +37,18 @@ crnt.each do |set|
   exists = prev.find do |prev_set|
     prev_set.code == set.code and prev_set.exists
   end
-  next if exists
+  next if exists and not set.code == set_code
 
   # request to api to get card names
-  get_names(set.code).each do |set_code, number, names|
-    card_type = card_types.find(set_code, number.to_i)
-    if (card_type)
-      card_type.contents[0].names = names
+  types, nfs = get_names(set.code)
+  types.each do |type|
+    if not card_types.find(type.set_code, type.number)
+      card_types.add(type)
     end
+  end
+
+  nfs.each do |nf|
+    notfounds << nf
   end
 
   set.exists = true
@@ -44,4 +62,10 @@ crnt.each do |set|
   File.open(File.expand_path( '../../db/expansions', __FILE__ ), "w") do |file|
     file.write(Marshal.dump(crnt))
   end
+
+  # update 
+  File.open(File.expand_path( '../../db/notfounds', __FILE__ ), "w") do |file|
+    file.write(Marshal.dump(notfounds))
+  end
+
 end
