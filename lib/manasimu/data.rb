@@ -1,12 +1,33 @@
 class Deck
 
   def self.create(lines)
-    items = Deck.input_to_card_hash(lines)
+    items, only_names = Deck.input_to_card_hash(lines)
+
+    # 名前だけの行を考慮する
+    names = only_names.map do |hash| hash[:name] end
+    types = find_card_types(names)
+
+    if types.length == names.length
+      only_names.each_with_index do |a, i|
+        name = types[i].name
+        if types[i].language == "ja"
+          name = types[i].names[0]
+        end
+        deck_item = {}
+        deck_item[:amount] = only_names[i][:amount]
+        deck_item[:name] = name
+        deck_item[:set] = types[i].set_code
+        deck_item[:setnum] = types[i].number
+        items << deck_item
+      end
+    end
+
     Deck.get_card_details(items)
   end
 
   def self.input_to_card_hash(lines)
     result = []
+    only_names = []
     looking_for_deck_line = false
     for line in lines do
       trimmed = line.chomp
@@ -53,11 +74,15 @@ class Deck
       deck_item = {}
       deck_item[:amount] = $1.strip
       deck_item[:name] = $2.strip
-      deck_item[:set] = $3.strip
-      deck_item[:setnum] = $4.strip
-      result << deck_item
+      if $3
+        deck_item[:set] = $3.strip
+        deck_item[:setnum] = $4.strip
+        result << deck_item
+      else
+        only_names << deck_item
+      end
     end
-    result
+    [result, only_names]
   end
 
   def self.card_types
