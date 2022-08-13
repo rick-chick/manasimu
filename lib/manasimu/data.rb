@@ -206,9 +206,11 @@ class Deck
           if language == en
             a = search_type.name.split(' // ')[0]
             if line =~ /^#{a}.*$/ and a != 'X'
+              search_type.language = 'en'
               ret << search_type
             end
           elsif language == ja
+            search_type.language = 'ja'
             ret << search_type
           else
             # none

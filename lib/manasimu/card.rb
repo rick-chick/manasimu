@@ -128,7 +128,7 @@ class Card
 end
 
 class CardType
-  attr_accessor :contents, :played, :drawed, :name, :can_plays, :mana_sources
+  attr_accessor :contents, :played, :drawed, :name, :can_plays, :mana_sources, :language
 
   def self.create(card_type, name)
     ret = card_type.dup

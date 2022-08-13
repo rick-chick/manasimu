@@ -5,5 +5,5 @@ lines = File.open('test_ja.txt', 'r') do |file|
 end
 
 Deck.find_card_types(lines).each do |type|
-  puts "#{type.name} #{type.set_code} #{type.number} #{type.names[0]}"
+  puts "#{type.name} #{type.set_code} #{type.number} #{type.names[0]} #{type.language}"
 end
