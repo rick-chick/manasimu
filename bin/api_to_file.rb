@@ -1,5 +1,4 @@
 require_relative '../lib/manasimu.rb'
-require_relative 'api_util.rb'
 
 set_code = nil
 

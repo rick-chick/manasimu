@@ -279,6 +279,10 @@ class CardType
     @contents[0].set_code
   end
 
+  def multiverseid
+    @contents[0].multiverseid
+  end
+
   def is_land?(side = nil)
     return @is_land if @is_land
     arr = if side == 'a'
@@ -459,7 +463,7 @@ class CardTypeAggregate
 end
 
 class Content
-  attr_accessor :name, :names, :number, :side, :set_code, :mana_cost, :type, :types, :color_identity, :converted_mana_cost, :text
+  attr_accessor :name, :names, :number, :side, :set_code, :mana_cost, :type, :types, :color_identity, :converted_mana_cost, :text, :multiverseid
 
   def initialize(hash)
     @name = hash[:name]
@@ -473,6 +477,7 @@ class Content
     @text = hash[:text]
     @color_identity = hash[:color_identity]
     @converted_mana_cost = hash[:converted_mana_cost].to_i
+    @multiverseid = hash[:multiverseid].to_i
   end
 
   def mana_source?
@@ -497,8 +502,97 @@ class Content
     text { '#{@text}'}
     color_identity { '#{@color_identity}'}
     converted_mana_cost {#{@converted_mana_cost}}
+    converted_mana_cost { #{@multiverseid} }
   end
 EOF
+  end
+
+end
+
+class CardInfo
+  attr_accessor :legalities, :sets
+end
+
+class Legality
+  attr_accessor :name
+  @@legalities = nil
+
+  def initialize(name)
+    @name = name
+  end
+
+  def to_s
+    @name
+  end
+
+  None = Legality.new("Legality")
+  Banned = Legality.new("Banned")
+  Restricted = Legality.new("Restricted")
+  Legal = Legality.new("Legal")
+
+  def self.all
+    return @@legalities if @@legalities
+    @@legalities= [
+      None,
+      Banned,
+      Restricted,
+      Legal,
+    ].sort! do |a,b| a.name <=> b.name end
+  end
+
+  def self.find(name)
+    self.all.bsearch do |a|
+      a.name >= name
+    end
+  end
+
+end
+
+class Format
+  attr_accessor :name
+  @@formats = nil
+
+  def initialize(name)
+    @name = name
+  end
+
+  def to_s
+    @name
+  end
+
+  Standard = Format.new("Standard")
+  Brawl = Format.new("Brawl")
+  Pioneer = Format .new("Pioneer")
+  Modern = Format .new("Modern")
+  Legacy = Format .new("Legacy")
+  Vintage = Format .new("Vintage")
+  Commander = Format .new("Commander")
+  Pauper = Format .new("Pauper")
+  Historic = Format .new("Historic")
+  Alchemy = Format .new("Alchemy")
+  Explorer = Format .new("Explorer")
+  
+  def self.all
+    return @@formats if @@formats
+    @@formats = [
+      Standard ,
+      Brawl ,
+      Pioneer ,
+      Modern ,
+      Legacy ,
+      Vintage ,
+      Commander ,
+      Pauper ,
+      Historic ,
+      Alchemy ,
+      Explorer ,
+    ].sort! do |a,b| a.name <=> b.name end
+  end
+
+  def self.find(name)
+    self.all.bsearch do |a|
+      a.name >= name
+    end
   end
 
 end

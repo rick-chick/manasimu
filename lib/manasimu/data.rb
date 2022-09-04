@@ -329,4 +329,5 @@ class Deck
     end
     return matrix.last.last
   end
+
 end
