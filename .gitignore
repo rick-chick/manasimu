@@ -9,3 +9,5 @@ tags
 vendor
 tmp
 tmp.log
+*.log
+Makefile
