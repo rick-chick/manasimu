@@ -11,6 +11,7 @@ gem 'guard-rspec'
 gem 'debug'
 gem 'gem-ctags'
 gem 'nokogiri' 
+gem 'rake-compiler' 
 
 group :test, :development do
   gem 'sqlite3'
